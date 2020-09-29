@@ -381,14 +381,21 @@ $(document).ready(function () {
 
     };
     /*******Account level object creation ends here********/
-    
+   // LTV Object : {"case1":33.333,"case2":66.667,"case3":333333.574,"case4":666666.907,"case5":666666.907}
     function calculateLTV(){
         LTVObj = {};
-        LTVObj.case1 = parseFloat((prsntOutstdng.val().trim()/valOfSecurity.val().trim()).toFixed(5));
-        LTVObj.case2 = parseFloat(((sanctndAmt.val().trim()+unsrvcdInt.val().trim())/valOfSecurity.val().trim()).toFixed(5));
-        LTVObj.case3 = parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(5));
-        LTVObj.case4 = parseFloat(((sanctndAmt.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(5));
-        LTVObj.case5 = parseFloat(((sanctndAmt.val().trim()+estIntMoratorium+unsrvcdInt.val().trim())/valOfSecurity.val().trim()).toFixed(5));
+        // console.log("prsntOutstdng.val().trim() :"+prsntOutstdng.val().trim());
+        // console.log("(prsntOutstdng.val().trim()+estIntMoratorium) : "+(prsntOutstdng.val().trim()+estIntMoratorium));
+        // console.log("valOfSecurity.val().trim() : "+ valOfSecurity.val().trim());
+        // console.log("((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()) : "+ parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium))/parseFloat(valOfSecurity.val().trim())));
+        // console.log("parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()) : " + parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim())));
+        // console.log("parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(5))*100 : "+ parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium))/parseFloat(valOfSecurity.val().trim())));
+
+        LTVObj.case1 = parseFloat((Number(prsntOutstdng.val().trim())*100/Number(valOfSecurity.val().trim())).toFixed(5));
+        LTVObj.case2 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim()).toFixed(5));
+        LTVObj.case3 = parseFloat(((Number(prsntOutstdng.val().trim()) + Number(estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5));
+        LTVObj.case4 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5));
+        LTVObj.case5 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(estIntMoratorium) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim()).toFixed(5));
         console.log("LTV Object : "+ JSON.stringify(LTVObj));
     }
     // var salariedLatestInc = 0,
