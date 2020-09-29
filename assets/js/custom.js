@@ -3,7 +3,7 @@ $(document).ready(function () {
     /******Variable Initialisation starts here******/
     window.accObj = {};
     var LTVObj = {};
-    var resRepPeriodObj = {};
+    var resRepPeriod = 0;
     window.stressObj = {};
     window.salStressPercentageConsolidated = 0;
     window.othStressPercentageConsolidated = 0;
@@ -187,11 +187,11 @@ $(document).ready(function () {
             '      </div>'+
             '      <br />'+
             '      <div class="row">'+
-            '        <div class="col-sm-3"><label id="lblIncomeLatest-'+ i +'" for="latestInc-1'+
-            '                  ">'+incomeSrc[0]+'</label><input type="tel" class="form-control" id="latestInc-1'+
+            '        <div class="col-sm-3"><label id="lblIncomeLatest-'+ i +'" for="latestInc-'+ i +
+            '                  ">'+incomeSrc[0]+'</label><input type="tel" class="form-control" id="latestInc-'+ i +
             '                  " placeholder="Enter Value"></div>'+
-            '        <div class="col-sm-3"><label id="lblIncomeFeb20-'+ i +'" for="feb20Inc-1'+
-            '                  ">'+incomeSrc[1]+'</label><input type="tel" class="form-control" id="feb20Inc-1'+
+            '        <div class="col-sm-3"><label id="lblIncomeFeb20-'+ i +'" for="feb20Inc-'+ i +
+            '                  ">'+incomeSrc[1]+'</label><input type="tel" class="form-control" id="feb20Inc-'+ i +
             '                  " placeholder="Enter Value"></div>'+
             '        <div class="col-sm-3">'+
             '          <label for="totalDeduction-'+ i +'">Total Deduction (Except Current EMI)</label>'+
@@ -221,8 +221,8 @@ $(document).ready(function () {
             '          <input type="tel" class="form-control" id="1819Profit-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
             '        <div class="col-sm-4">'+
-            '          <label for="blncPrdSnctnTrm-'+ i +'" data-toggle="tooltip" title="If net profit of FY 2019-20 not available">'+
-            '            Balance period as per sanction terms (in months)<sup><span class="badge badge-warning">i</span></sup>'+
+            '          <label for="blncPrdSnctnTrm-'+ i +'">'+
+            '            Balance period as per sanction terms (in months)'+
             '          </label>'+
             '          <input type="tel" class="form-control" id="blncPrdSnctnTrm-'+ i +'" placeholder="Enter Value">'+
             '        </div>'+
@@ -342,23 +342,24 @@ $(document).ready(function () {
     };
 
     /*******Account level object creation starts here********/
-    
+    var accSchmSelectedVal = "";
     function createAccObject(){
         accObj = {};
         console.log("Inside Create Acc Object Function : "+$accType.val());
-        var accType = $accType.val(),
-            accSchm = $accSchm.val(),
+        var accType = $accType.val(),            
             accNo = $('#accNo').val().trim();
+        accSchmSelectedVal = $accSchm.val();
+        console.log("SKYYYYYYYYY  accSchmSelectedVal = $accSchm.val(); :"+  accSchmSelectedVal);
         if(accType == null || accType == ""){
             alert("Error! Please select account type");
         }else{
             accObj.accType =  accType;
         }
         
-        if(accSchm == "" || accSchm == null){
+        if(accSchmSelectedVal == "" || accSchmSelectedVal == null){
             alert("Error! Please select account scheme");
         }else{
-            accObj.scheme =  accSchm;
+            accObj.scheme =  accSchmSelectedVal;
         }
         
         if(accNo == "" || accNo.length != 14){
@@ -383,6 +384,7 @@ $(document).ready(function () {
     /*******Account level object creation ends here********/
    // LTV Object : {"case1":33.333,"case2":66.667,"case3":333333.574,"case4":666666.907,"case5":666666.907}
     function calculateLTV(){
+       
         LTVObj = {};
         // console.log("prsntOutstdng.val().trim() :"+prsntOutstdng.val().trim());
         // console.log("(prsntOutstdng.val().trim()+estIntMoratorium) : "+(prsntOutstdng.val().trim()+estIntMoratorium));
@@ -397,6 +399,9 @@ $(document).ready(function () {
         LTVObj.case4 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5));
         LTVObj.case5 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(estIntMoratorium) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim()).toFixed(5));
         console.log("LTV Object : "+ JSON.stringify(LTVObj));
+
+
+        calculateMaxResRepPeriod();
     }
     // var salariedLatestInc = 0,
     //     salariedFeb20Inc = 0,
@@ -724,10 +729,35 @@ $(document).ready(function () {
 
     }
 
+
+    console.log("accSchmSelectedVal before calculateMaxResRepPeriod() function: "+ accSchmSelectedVal);
+    //Calculator 3
     function calculateMaxResRepPeriod(){
-        //resRepPeriodObj.case1 = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
-        //resRepPeriodObj.case2 = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
-        //resRepPeriodObj.case3 =  Mohit Sir to clarify
+        var $allApplicantBlncPeriod = $( "input[id^='blncPrdSnctnTrm-']" );
+
+        var arr = [];
+        $.each($allApplicantBlncPeriod , function(i, item) {  //i=index, item=element in array
+            console.log("Testing: allApplicantBlncPeriod : "+ $(item).val());
+            arr[i] = $(item).val();
+        });
+        var minimumOfApplicantBlncPeriod = Math.min.apply(Math, arr);
+
+        if(accSchmSelectedVal === "MLOD"){
+            resRepPeriod = Math.min(144, minimumOfApplicantBlncPeriod);
+        }else{
+            resRepPeriod = Math.max(Number(blncLoanTenure.val().trim()), Number(minimumOfApplicantBlncPeriod));
+            if(resRepPeriod > 180)
+                resRepPeriod = resRepPeriod;
+        }
+
+        console.log("resRepPeriod  Inside: "+ resRepPeriod);
+    }
+
+    console.log("resRepPeriod  Outside: "+ resRepPeriod);
+
+    //Calculator 4
+    function calculateMaxExtension(){
+        
     }
 
     //function 
