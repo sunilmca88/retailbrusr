@@ -299,12 +299,16 @@ $(document).ready(function () {
             var selectedBorrowerType = $('option:selected', this).val();
             console.log(elemIndex);
             console.log(selectedBorrowerType);
+            $("#sector-"+elemIndex).empty();
+            
             if(selectedBorrowerType === "sal"){
                 $('#lblIncomeLatest-'+elemIndex).text("Latest Salary");
                 $('#lblIncomeFeb20-'+elemIndex).text("Salary in Feb 2020");
                 $('#1920Profit-'+elemIndex).val("").attr('disabled', true);
                 $('#netProfitYr-'+elemIndex).val("").attr('disabled', true);
                 $('#sector-'+elemIndex).val("").attr('disabled', true);
+                $("#sector-"+elemIndex).append($("<option></option>")
+                        .attr("value", "").text("Select"));
             }else  if(selectedBorrowerType === "oth"){
                 $.each(sectorOptions, function (key, value) {
                     $("#sector-"+elemIndex).append($("<option></option>")
@@ -380,11 +384,11 @@ $(document).ready(function () {
     
     function calculateLTV(){
         LTVObj = {};
-        LTVObj.case1 = parseFloat((prsntOutstdng.val().trim()/valOfSecurity.val().trim()).toFixed(2));
-        LTVObj.case2 = parseFloat(((sanctndAmt.val().trim()+unsrvcdInt.val().trim())/valOfSecurity.val().trim()).toFixed(2));
-        LTVObj.case3 = parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(2));
-        LTVObj.case4 = parseFloat(((sanctndAmt.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(2));
-        LTVObj.case5 = parseFloat(((sanctndAmt.val().trim()+estIntMoratorium+unsrvcdInt.val().trim())/valOfSecurity.val().trim()).toFixed(2));
+        LTVObj.case1 = parseFloat((prsntOutstdng.val().trim()/valOfSecurity.val().trim()).toFixed(5));
+        LTVObj.case2 = parseFloat(((sanctndAmt.val().trim()+unsrvcdInt.val().trim())/valOfSecurity.val().trim()).toFixed(5));
+        LTVObj.case3 = parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(5));
+        LTVObj.case4 = parseFloat(((sanctndAmt.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(5));
+        LTVObj.case5 = parseFloat(((sanctndAmt.val().trim()+estIntMoratorium+unsrvcdInt.val().trim())/valOfSecurity.val().trim()).toFixed(5));
         console.log("LTV Object : "+ JSON.stringify(LTVObj));
     }
     // var salariedLatestInc = 0,
