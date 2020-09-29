@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+
+  <!-- Custom styles for this template -->
+  <link rel="stylesheet" href="./assets/css/custom.css"> 
+  <style>
+
+    .col {width: 100%;}
+    @media only screen and (min-width: 768px) {
+      /*For desktop*/
+      .col {width: 30%;}
+    }
+   
+
+    body > .container {
+      padding: 40px 10px 0;
+      margin-bottom: 20px;       
+    }
+    body {
+      /* Margin bottom by footer height */
+      /* min-height: 75rem; */
+      padding-top: 4.5rem;
+    }
+    .btn-bob {
+        color: #fff;
+        background-color: #ff6633;
+        border-color: #ff6633;
+    }
+    .col-sm-12{
+      margin-bottom: 10px;
+    }
+  </style>
+  <title>Bank of Baroda</title>
+  <link rel="shortcut icon" href="./assets/img/favicon.ico">
+</head>
+
+<body>
+  <header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-light">
+      <a class="navbar-brand" href="#">
+        <img src="./assets/img/logo.png" alt="Logo" style="width:150px;">
+      </a>
+    </nav>
+  </header>
+
+  <!-- Begin page content -->
+  <main role="main" class="container col">
+    <div class="card bg-light">
+      <div class="card-header"><b>Login</b></div>
+      <div class="card-body">
+        <!--ROW 1 STARTS HERE-->
+        <div class="row" id="genOTP">
+          <div class="col-sm-12">
+            <label for="bank">Bank Name</label>
+            <select id="bank" class="form-control">
+              <option value="" selected disabled>Select</option>
+              <option value="ED">eDena</option>
+              <option value="EV">eVijaya</option>
+              <option value="BOB">Bank of Baroda</option>
+            </select>
+          </div>
+          <div class="col-sm-12">
+            <label for="accNo">Loan Account Number*</label>
+            <input type="tel" class="form-control" id="accNo" placeholder="Enter Loan Account Number" disabled>
+            <small class="font-weight-light font-italic" id="eVijayaMsg">
+              In case you are a customer of eVijaya bank please enter your new account number only.
+              <a href="https://apps.bobinside.com/accmap/" target="_blank"><b>Click here</b></a> to know your new account number 
+            </small>
+          </div>
+          <!-- <div class="col-sm-12">
+            <br/>
+          </div> -->
+          <div class="col-sm-12">
+            <label for="mobNo">Mobile Number*</label>
+            <input type="tel" class="form-control" id="mobNo" placeholder="Enter Mobile Number" disabled>
+            <small class="font-weight-light font-italic">Mobile number should be linked with account entered above</small>
+          </div>
+          <!-- <div class="col-sm-12">
+            <br/>
+          </div> -->
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-bob" style="width:100%;" id="btnGenOTP" disabled>Generate OTP</button>
+          </div>
+        </div>
+        
+        <!--ROW 1 ENDS HERE-->
+
+         <!--ROW 2 STARTS HERE-->
+         <div class="row" id="validateOTP" >
+          <div class="col-sm-12">
+            <label>Loan Account Number*</label>
+            <input type="tel" class="form-control" placeholder="Enter Loan Account Number" id="hidTxtAccNo" disabled>
+          </div>
+          
+          <div class="col-sm-12">
+            <label>Mobile Number*</label>
+            <input type="tel" class="form-control" placeholder="Enter Mobile Number" id="hidTxtMobNo" disabled>            
+          </div>
+          <div class="col-sm-12">
+            <br/>
+          </div>
+          <div class="col-sm-12">
+            <label for="txtOTP">OTP*</label>
+            <input type="tel" class="form-control" id="txtOTP" placeholder="Enter 8 Digit OTP">
+            <small class="font-weight-light font-italic">
+              <a href="#" id="resend_otp"><b>Resend OTP</b></a>
+            </small>
+          </div>
+          <div class="col-sm-12">
+            <br/>
+          </div>
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-bob" style="width:100%;" id="submitOTP">Submit OTP</button>
+          </div>
+        </div>
+        <!--ROW 2 ENDS HERE-->
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Error</h5>
+                <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button> -->
+              </div>
+              <div class="modal-body">
+                <h6 id="modalMsg"></h6>
+                  <!-- <br/> <br/>Don't press <b class="badge-warning" style="padding:0 5px">F5</b> or <b class="badge-warning" style="padding:0 5px">CTRL+R</b>. </h6> -->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+   
+  </main>
+
+  
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="./assets/js/jquery-3.2.1.slim.min.js"></script>  
+  <script src="./assets/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+      function disableAllBtn(){
+        $(':button').attr('disabled', true);
+      }
+     
+      $('#validateOTP').hide();
+      var $bank = $('#bank');
+      var selectedBank = "";
+      $('#btnGenOTP').click(function(){
+        var accNo = $('#accNo').val().trim();
+        var mobNo = $('#mobNo').val().trim();
+        if("" === accNo || "" === mobNo){
+          $('#staticBackdropLabel').html("Error");
+          $('#modalMsg').text("Please enter account number and mobile number and then click generate OTP button.");
+          $('#staticBackdrop').modal();
+        }else if(!$.isNumeric(accNo) || !$.isNumeric(mobNo)){
+          $('#staticBackdropLabel').html("Error");
+          $('#modalMsg').text("Only Numbers are allowed");
+          $('#staticBackdrop').modal();
+          $('#accNo').val("");
+          $('#mobNo').val("");
+        }else if(accNo.length != 14 /*&& "BOB" === selectedBank*/){
+          $('#staticBackdropLabel').html("Error");
+          $('#modalMsg').text("Recheck Account Number length. It should be 14 digits only");
+          $('#staticBackdrop').modal();
+        }/*else if(accNo.length != 15 && "EV" === selectedBank){
+          $('#staticBackdropLabel').html("Error");
+          $('#modalMsg').text("Recheck Account Number length. It should be 15 digits only");
+          $('#staticBackdrop').modal();
+        }*/else if(mobNo.length != 10){
+          $('#staticBackdropLabel').html("Error");
+          $('#modalMsg').text("Recheck Mobile Number length. It should be 10 digits without country code");
+          $('#staticBackdrop').modal();
+        }else{
+          $('#genOTP').hide();
+          $('#hidTxtAccNo').val($('#accNo').val());
+          $('#hidTxtMobNo').val($('#mobNo').val());
+          $('#staticBackdropLabel').html("Information");
+          $('#modalMsg').text("OTP sent to your number XXXXX1916");
+          $('#staticBackdrop').modal();
+          $('#validateOTP').show();
+        } 
+        
+      });
+
+      $('#submitOTP').click(function(){
+        var OTP = $('#txtOTP').val().trim();
+        if("" === OTP || !$.isNumeric(OTP) || OTP.length != 8){
+          $('#staticBackdropLabel').html("Error");
+          $('#modalMsg').text("Please enter 8 digit OTP and then click submit OTP button.");
+          $('#staticBackdrop').modal();
+          $('#txtOTP').val("");
+        }else{
+          window.location.replace("./custindex");
+          //window.location.href = "./index.html";
+        }
+      });
+      $('#eVijayaMsg').hide();
+      $bank.change(function(){
+        selectedBank = $('option:selected', this).val();
+        if("ED" === selectedBank){
+          // $('#genOTP').hide();
+          $('#btnGenOTP').attr('disabled', true);
+          $('#accNo').attr('disabled', true);
+          $('#mobNo').attr('disabled', true);
+          $('#eVijayaMsg').hide();
+          $('#staticBackdropLabel').html("Information");
+          $('#modalMsg').text("Please contact your base Branch for information on eligibility and necessary action.");
+          $('#staticBackdrop').modal();
+        }else if("EV" === selectedBank){
+          $('#btnGenOTP').removeAttr('disabled');
+          $('#accNo').removeAttr('disabled');
+          $('#mobNo').removeAttr('disabled');
+          $('#eVijayaMsg').show();
+        }else if("BOB" === selectedBank){
+          $('#btnGenOTP').removeAttr('disabled');
+          $('#accNo').removeAttr('disabled');
+          $('#mobNo').removeAttr('disabled');
+          $('#eVijayaMsg').hide();
+        }else{
+          $('#genOTP').hide();
+        }
+      });
+
+      $('#resend_otp').click(function(){
+        disableAllBtn();
+        alert("Resend OTP form submit here");
+
+      });
+
+    });
+  </script>
+</body>
+
+</html>

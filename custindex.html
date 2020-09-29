@@ -1,0 +1,203 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+
+  <!-- Custom styles for this template -->
+  <link rel="stylesheet" href="./assets/css/custom.css">
+
+  <title>Bank of Baroda</title>
+  <style>
+    .row{
+    margin-bottom: 20px!important;
+    }
+    body > .container {
+        padding: 50px 10px 0;
+    }
+    .btn-bob {
+        color: #fff;
+        background-color: #ff6633;
+        border-color: #ff6633;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="./assets/img/logo.png" alt="Logo" style="width:150px;">
+          </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+        aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <!-- <p class="text-white navbar-nav mr-auto">sdfdf</p> -->
+        <ul class="navbar-nav" style="margin-left: auto!important;">
+          <li class="nav-item active">
+            <a class="nav-link" href="#">
+              <span class="badge btn-bob">URN: 2020XXXXXXXX123</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="#">
+              <span class="badge btn-bob">Name: Chinmoy Mandal</span>
+            </a>
+          </li>
+          
+        </ul>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- Begin page content -->
+  <main role="main" class="container">
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Error</h5>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+          </div>
+          <div class="modal-body">
+            <h6 id="errTxt">Please do not refresh this page otherwise data will be lost and session will expire.
+               <br/> <br/>Don't press <b class="badge-warning" style="padding:0 5px">F5</b> or <b class="badge-warning" style="padding:0 5px">CTRL+R</b>. </h6>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">I Accept</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="card bg-light">
+      <div class="card-header text-center"><b>Provisional Eligibility Check for Resolution Framework</b></div>
+      <div class="card-body">
+        <!--ROW 1 STARTS HERE-->
+        <div class="row">
+          <div class="col-sm">
+            <label for="accNo">Account Number</label>
+            <input type="tel" class="form-control" id="accNo" placeholder="Enter Account No." value="2904XXXXX2323" disabled>
+          </div>
+          <div class="col-sm">
+            <label for="borrowerType">Borrower Type</label>
+            <select id="borrowerType" class="form-control">
+              <option value="" selected disabled>Select</option>
+              <option value="sal">Salaried</option>
+              <option value="oth">Other Individuals(Self-Employed/Businessman)</option>
+              <option value="laFrr">Loan against Rent Receivables</option>
+              <option value="salAndOth">Salaried and Other Individuals Both</option>
+            </select>
+          </div>
+        </div>
+        <!--ROW 1 ENDS HERE-->
+
+        <!--ROW 2 STARTS HERE-->
+        <div class="row" id="rowSal">
+          <div class="col-sm">
+            <label for="txtCombinedLatestSalary" id="lblCombinedLatestSalary" data-toggle="tooltip" title="Sum of latest/current salary of all co-borrowers">
+              Combined Latest Salary of all Borrowers <sup><span class="badge btn-bob">i</span></sup>
+            </label>
+            <input type="tel" class="form-control" id="txtCombinedLatestSalary" placeholder="Enter Value">
+          </div>
+          <div class="col-sm">
+            <label for="txtCombinedFeb20Salary" id="lblCombinedFeb20Salary" data-toggle="tooltip" title="Sum of salary of all co-borrowers in February 2020">
+                Combined Salary of all Borrowers as on 29 Feb 2020 <sup><span class="badge btn-bob">i</span></sup>
+            </label>
+            <input type="tel" class="form-control" id="txtCombinedFeb20Salary" placeholder="Enter Value">
+          </div> 
+        </div>
+        <!--ROW 2 ENDS HERE-->
+        <!--ROW 3 STARTS HERE-->
+        <div class="row" id="rowGMBR">
+            <div class="col-sm">
+              <label for="txtCombinedLatestGMBR" id="lblCombinedLatestGMBR" data-toggle="tooltip" title="GMBR: Gross Monthly Business Receipts">
+                Combined GMBR of all Borrowers during last month <sup><span class="badge btn-bob">i</span></sup>
+              </label>
+              <input type="tel" class="form-control" id="txtCombinedLatestGMBR" placeholder="Enter Value">
+            </div>
+            <div class="col-sm">
+              <label for="gmbrType"><small>Previous GMBR Options (If GMBR of Same month of 2019 is available, else choose GMBR of Feb 2020)</small></label>
+              <select id="gmbrType" class="form-control">
+                <!-- <option selected disabled>Select</option> -->
+                <option value="GMBR2019" selected>GMBR of Same month in 2019</option>
+                <option value="GMBR2020">GMBR of February 2020</option>
+                <!-- Options will be loaded dynamically with JS -->
+              </select>
+            </div>
+            <div class="col-sm">
+              <label for="txtCombinedFeb20GMBR" id = "lblGMBR1920" data-toggle="tooltip" title="GMBR: Gross Monthly Business Receipts">
+                  Combined GMBR of all Borrowers during Same month in 2019 <sup><span class="badge btn-bob">i</span></sup>
+              </label>
+              <input type="tel" class="form-control" id="txtCombinedFeb20GMBR" placeholder="Enter Value">
+            </div> 
+        </div>
+        <!--ROW 3 ENDS HERE-->
+        <!--ROW 3 STARTS HERE-->
+        <div class="row" id="rowRent">
+            <div class="col-sm">
+               <label for="txtLatestRent">Latest Rent</label>
+               <input type="tel" class="form-control" id="txtLatestRent" placeholder="Enter Value">
+            </div>
+            <div class="col-sm">
+                <label for="txtFeb20Rent">Rent in February 2020</label>
+                <input type="tel" class="form-control" id="txtFeb20Rent" placeholder="Enter Value">
+            </div>
+        </div>
+        <!--ROW 3 ENDS HERE-->
+
+        <!--ROW 4 STARTS HERE-->
+         <div class="row" id="rowResult">
+            <div class="col-sm alert alert-warning" role="alert" id="result">
+                
+            </div>
+        </div>
+        <!--ROW 4 ENDS HERE-->
+        
+        <!--ROW 5 STARTS HERE-->
+         <div class="row" id="rowCalculate">
+            <div class="col-sm-12 text-center">
+                <button type="button" class="btn btn-bob w-50" id="btnChkElgblty">Check Eligibility</button>
+            </div>
+        </div>
+        <!--ROW 5 ENDS HERE-->
+       
+      </div>
+    </div>
+
+    
+
+     <!-- <button type="button" class="btn btn-info float" id="btnCalculate">Download</button> -->
+  </main>
+
+  <!-- <footer class="footer">
+    <div class="container">
+      <span class="text-muted">Copyright Here</span>
+    </div>
+  </footer> -->
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="./assets/js/jquery-3.2.1.slim.min.js"></script>
+  <script src="./assets/js/popper.min.js"></script>
+  <script src="./assets/js/bootstrap.min.js"></script>
+  <script src="./assets/js/custindex.js"></script>
+
+</body>
+
+</html>
