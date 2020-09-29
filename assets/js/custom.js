@@ -55,6 +55,21 @@ $(document).ready(function () {
         "9":"9",
         "10":"10"
     };
+
+    var sectorOptions = {
+        "Select":"",
+        "Entertainment": "ent",
+        "Gems & Jewellery": "gem",
+        "Tourism": "tou",
+        "Hospitality": "hos",
+        "Electronics": "ele",
+        "Logistics": "log",
+        "Metal": "met",
+        "Automotive": "aut",
+        "Other": "oth"
+    };
+
+
     var isFRR = "" ; //for enabling and disabling borrower type dropdown
     var incomeSrc = ["Latest Sal/Rent/GMBR","Sal/Rent/GMBR of Feb 2020"];
     var $accType = $("#accType");
@@ -158,24 +173,15 @@ $(document).ready(function () {
             '       <input type="text" class="form-control" id="borrowerName-'+ i +'" placeholder="Enter Name">'+
             '   </div>'+
             '        <div class="col-sm-3"><label for="borrowerType-'+ i +'">Borrower Type</label>'+
-            '          <select id="borrowerType-'+ i +'" class="form-control" >'+
+            '          <select id="borrowerType-'+ i +'" class="form-control" '+isFRR+'>'+
             '            <option selected value="">Select</option>'+
             '            <option value="sal">Salaried</option>'+
             '            <option value="oth">Other Individual</option>'+
             '          </select>'+
             '        </div>'+
             '        <div class="col-sm-3"><label for="sector-'+ i +'">Sector</label>'+
-            '          <select id="sector-'+ i +'" class="form-control" >'+
+            '          <select id="sector-'+ i +'" class="form-control" disabled>'+
             '            <option selected value="">Select</option>'+
-            '            <option value="ent">Entertainment</option>'+
-            '            <option value="gem">Gems & Jewellery</option>'+
-            '            <option value="tou">Tourism</option>'+
-            '            <option value="hos">Hospitality</option>'+
-            '            <option value="ele">Electronics</option>'+
-            '            <option value="log">Logistics</option>'+
-            '            <option value="met">Metal</option>'+
-            '            <option value="aut">Automotive</option>'+
-            '            <option value="oth">Others</option>'+
             '          </select>'+
             '        </div>'+
             '      </div>'+
@@ -189,20 +195,20 @@ $(document).ready(function () {
             '                  " placeholder="Enter Value"></div>'+
             '        <div class="col-sm-3">'+
             '          <label for="totalDeduction-'+ i +'">Total Deduction (Except Current EMI)</label>'+
-            '          <input type="tel" class="form-control" id="totalDeduction-'+ i +'" placeholder="Enter Value" >'+
+            '          <input type="tel" class="form-control" id="totalDeduction-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
             '        <div class="col-sm-3">'+
             '          <label for="foir-'+ i +'" data-toggle="tooltip" title="Based on income & schematic guidelines">'+
             '            Applicable FOIR <sup><span class="badge badge-warning">i</span></sup>'+
             '          </label>'+
-            '          <input type="tel" class="form-control" id="foir-'+ i +'" placeholder="Enter Value">'+
+            '          <input type="tel" class="form-control" id="foir-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
             '      </div>'+
             '      <br/>'+
             '      <div class="row">'+
             '        <div class="col-sm-2">'+
             '          <label for="netProfitYr-'+ i +'">Net Profit Year</label>'+
-            '          <select id="netProfitYr-'+ i +'" class="form-control" >'+
+            '          <select id="netProfitYr-'+ i +'" class="form-control" '+isFRR+'>'+
             '            <option selected value="">Select</option>'+
             '            <option value="yr1920">2019-2020</option>'+
             '            <option value="yr1819">2018-2019</option>'+
@@ -212,7 +218,7 @@ $(document).ready(function () {
             '          <label for="1819Profit-'+ i +'" data-toggle="tooltip" title="If net profit of FY 2019-20 not available">'+
             '            100% Net Profit of FY 2018-19 <sup><span class="badge badge-warning">i</span></sup>'+
             '          </label>'+
-            '          <input type="tel" class="form-control" id="1819Profit-'+ i +'" placeholder="Enter Value">'+
+            '          <input type="tel" class="form-control" id="1819Profit-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
             '        <div class="col-sm-4">'+
             '          <label for="blncPrdSnctnTrm-'+ i +'" data-toggle="tooltip" title="If net profit of FY 2019-20 not available">'+
@@ -256,7 +262,10 @@ $(document).ready(function () {
             //     '"></h3></div></div></div>';
             $('#applicants').append(borrowerElem);
             $('#lblfoir-'+i).tooltip();
-            //$('#lbl1819Profit-'+i).tooltip();
+            $("label[for='1819Profit-"+i+"']").tooltip();
+            $("label[for='foir-"+i+"']").tooltip();
+            $("label[for='blncPrdSnctnTrm-"+i+"']").tooltip();            
+            $('#lbl1819Profit-'+i).tooltip();
         }
 
 
@@ -295,7 +304,14 @@ $(document).ready(function () {
                 $('#lblIncomeFeb20-'+elemIndex).text("Salary in Feb 2020");
                 $('#1920Profit-'+elemIndex).val("").attr('disabled', true);
                 $('#netProfitYr-'+elemIndex).val("").attr('disabled', true);
+                $('#sector-'+elemIndex).val("").attr('disabled', true);
             }else  if(selectedBorrowerType === "oth"){
+                $.each(sectorOptions, function (key, value) {
+                    $("#sector-"+elemIndex).append($("<option></option>")
+                        .attr("value", value).text(key));
+                });
+                $('#sector-'+elemIndex).removeAttr('disabled');
+
                 $('#lblIncomeLatest-'+elemIndex).text("Latest GMBR");
                 $('#lblIncomeFeb20-'+elemIndex).text("Previous GMBR");
                 $('#1920Profit-'+elemIndex).val("").removeAttr('disabled')
