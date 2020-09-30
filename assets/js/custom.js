@@ -783,10 +783,17 @@ $(document).ready(function () {
     }
 
     //Calculator 5
+    
     function calculateFOIR(){
+        FOIRObj = {};
+        var applicantFOIR = [];
         if(stressObj.case === "case-2" || stressObj.case === "case-3" || 
             stressObj.case === "case-5" || stressObj.case === "case-6"){
-
+                if(selectedAccType === "frr"){
+                    FOIRObj.upto_month24 = $('#latestInc-1').val().trim();
+                    FOIRObj.after_month24 = $('#feb20Inc-1').val().trim();
+                    console.log("FOIRObj inside FRR : "+ FOIRObj);
+                }
         }
 
         if(stressObj.case === "case-8" || stressObj.case === "case-9"){
@@ -796,7 +803,7 @@ $(document).ready(function () {
         if(stressObj.case === "case-10" || stressObj.case === "case-11"){
 
         }
-
+        
     }
 
 
@@ -866,7 +873,7 @@ $(document).ready(function () {
         LTV = [];
         createAccObject(); //To Create Account level object
         calculateLTV(); //To Calculate LTV for all scenario
-
+        calculateFOIR();
         maxOfSchmSnctdLTV = parseFloat(Math.max(sanctLTV.val().trim(), schmLTV.val().trim())).toFixed(2);
        // maxOfBlncTenureRetirementAge = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
          applicants = [];   
