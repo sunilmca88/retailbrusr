@@ -404,13 +404,6 @@ $(document).ready(function () {
     function calculateLTV(){
        
         LTVObj = {};
-        // console.log("prsntOutstdng.val().trim() :"+prsntOutstdng.val().trim());
-        // console.log("(prsntOutstdng.val().trim()+estIntMoratorium) : "+(prsntOutstdng.val().trim()+estIntMoratorium));
-        // console.log("valOfSecurity.val().trim() : "+ valOfSecurity.val().trim());
-        // console.log("((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()) : "+ parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium))/parseFloat(valOfSecurity.val().trim())));
-        // console.log("parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()) : " + parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim())));
-        // console.log("parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium)/valOfSecurity.val().trim()).toFixed(5))*100 : "+ parseFloat(((prsntOutstdng.val().trim()+estIntMoratorium))/parseFloat(valOfSecurity.val().trim())));
-
         LTVObj.case1 = parseFloat((Number(prsntOutstdng.val().trim())*100/Number(valOfSecurity.val().trim())).toFixed(5));
         LTVObj.case2 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim()).toFixed(5));
         LTVObj.case3 = parseFloat(((Number(prsntOutstdng.val().trim()) + Number(estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5));
@@ -421,13 +414,35 @@ $(document).ready(function () {
 
         calculateMaxResRepPeriod();
     }
-    // var salariedLatestInc = 0,
-    //     salariedFeb20Inc = 0,
-    //     otherLatestInc = 0,
-    //     otherFeb20Inc = 0;
    
+
+    // This function is used to assign case type to individual borrower of a loan 
+    // to faclitate in calculation of FOIR for everybody individually
+    function getCaseTypeOfBrwr(stressPercentage, brwrType){
+        if(brwrType === "sal"){
+            if(stressPercentage >= 0 && stressPercentage <= 25)
+                return "case-1";
+            if(stressPercentage > 25 && stressPercentage <= 40)
+                return "case-2";
+            if(stressPercentage > 40 && stressPercentage < 100)
+                return "case-3";
+            if(stressPercentage == 100)
+                return "case-10";
+        }else if(brwrType === "oth"){
+            if(stressPercentage >=0 && stressPercentage < 50)
+                return "case-7";
+            if(stressPercentage >= 50 && stressPercentage < 100)
+                return "case-8";
+            if(stressPercentage == 100)
+                return "case-9";
+
+        }else{
+            return "Error in getCaseTypeOfBrwr Function";
+        }
+    }
+
     function calculateConsolidatedIncome(accType){
-        applicants = [];
+        //applicantsObj = [];
         var consolidatedCaseType = "";
         salStressPercentageConsolidated = 0;
         othStressPercentageConsolidated = 0;
@@ -436,7 +451,7 @@ $(document).ready(function () {
             otherLatestInc = 0,
             otherFeb20Inc = 0,
             noOfApplicant = $noOfApplicant.val();
-        var applicants = []
+        //var applicantsObj = []
         for(i=1; i<=noOfApplicant; i++){
             
             var tempLatestInc = Number($('#latestInc-'+i).val().trim()) || 0;
@@ -448,10 +463,10 @@ $(document).ready(function () {
             var tempFOIR = $('#foir-'+i).val().trim();
             var tempBlncPrdSnctnTrm = $('#blncPrdSnctnTrm-'+i).val().trim();
             var tempBrwrImpact = $('#borrowerImpact-'+i).html();
-
+            var applicableCaseOnBrwr = getCaseTypeOfBrwr(Number(tempBrwrImpact.split('%')[0]), tempBrwrType);
             if(tempBrwrType === "sal"){
-
-                applicants[i-1] = {
+                
+                applicantsObj[i-1] = {
                     name: tempName,
                     borrowerType: tempBrwrType, 
                     latestInc: tempLatestInc,
@@ -459,7 +474,8 @@ $(document).ready(function () {
                     totalDeduction: tempTotDeduction,
                     foir: tempFOIR,
                     blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
-                    impact: tempBrwrImpact
+                    impact: tempBrwrImpact,
+                    caseType: applicableCaseOnBrwr
                 }
 
                 console.log("Latest Salary : "+ tempLatestInc);
@@ -469,18 +485,19 @@ $(document).ready(function () {
                 console.log("i:------> "+salariedFeb20Inc);
             }
             if(tempBrwrType === "oth"){             
-                applicants[i-1] = {
+                applicantsObj[i-1] = {
                     name: tempName,
                     borrowerType: tempBrwrType,
                     sector : $('#sector-'+i).val(),
                     latestInc: tempLatestInc,
                     feb20Inc: tempFeb20Inc,
-                    totalDeduction: $('#totalDeduction-'+i).val().trim(),
-                    foir: $('#foir-'+i).val().trim(),
+                    totalDeduction: tempTotDeduction,
+                    foir: tempFOIR,
                     profitYr : $('#netProfitYr-'+i).val(),
                     profit :  $('#netProfitVal-'+i).val(),
-                    blncPrdSnctnTrm: $('#blncPrdSnctnTrm-'+i).val().trim(),
-                    impact: $('#borrowerImpact-'+i).html()
+                    blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
+                    impact: tempBrwrImpact,
+                    caseType: applicableCaseOnBrwr
                 }
                 
                 otherLatestInc += parseFloat(tempLatestInc);
@@ -493,7 +510,7 @@ $(document).ready(function () {
         console.log("othStressPercentageConsolidated: "+ othStressPercentageConsolidated);
 
         if(salStressPercentageConsolidated === 0){
-            if(othStressPercentageConsolidated < 50 && othStressPercentageConsolidated > 0){
+            if(othStressPercentageConsolidated < 50 && othStressPercentageConsolidated >= 0){
                 consolidatedCaseType = "case-7";
                 resolutionFramework = ["NA"];
                 stressType = "Minimum Stress";
@@ -524,12 +541,12 @@ $(document).ready(function () {
                 stressType = "Severe Stress";
             }
 
-        }else if(salStressPercentageConsolidated <= 25 && salStressPercentageConsolidated > 0){
+        }else if(salStressPercentageConsolidated <= 25 && salStressPercentageConsolidated >= 0){
             if(othStressPercentageConsolidated === 0){
                 consolidatedCaseType = "case-1";
                 resolutionFramework = ["NA"];
                 stressType = "Minimum Stress";
-            }else if(othStressPercentageConsolidated < 50 && othStressPercentageConsolidated > 0){
+            }else if(othStressPercentageConsolidated < 50 && othStressPercentageConsolidated >= 0){
                 consolidatedCaseType = "case-1_7";
                 resolutionFramework = ["NA"];
                 stressType = "Minimum Stress";
@@ -668,7 +685,7 @@ $(document).ready(function () {
         stressObj.stressType = stressType;
         stressObj.LTV = LTV;
         stressObj.resolutionFramework = resolutionFramework; 
-        stressObj.applicants = applicants;
+        stressObj.applicants = applicantsObj;
         //stressObj.acctype = accType;
         console.log("stressObj for Loan and OD : "+ JSON.stringify(stressObj));
 
@@ -787,13 +804,70 @@ $(document).ready(function () {
     function calculateFOIR(){
         FOIRObj = {};
         var applicantFOIR = [];
-        if(stressObj.case === "case-2" || stressObj.case === "case-3" || 
-            stressObj.case === "case-5" || stressObj.case === "case-6"){
-                if(selectedAccType === "frr"){
-                    FOIRObj.upto_month24 = $('#latestInc-1').val().trim();
-                    FOIRObj.after_month24 = $('#feb20Inc-1').val().trim();
-                    console.log("FOIRObj inside FRR : "+ FOIRObj);
+        if(selectedAccType === "frr" && (stressObj.case === "case-5"  || stressObj.case === "case-6")){
+            FOIRObj.upto_month24 = $('#latestInc-1').val().trim();
+            FOIRObj.after_month24 = $('#feb20Inc-1').val().trim();
+            console.log("FOIRObj inside FRR : "+ FOIRObj);
+        }else{
+            for(i=1; i<=noOfApplicant; i++){
+                var tempLatestInc = Number($('#latestInc-'+i).val().trim()) || 0;
+                var tempFeb20Inc = Number($('#feb20Inc-'+i).val().trim()) || 0;
+                var tempBrwrType = $('#borrowerType-'+i).val() || "";
+
+                var tempTotDeduction = $('#totalDeduction-'+i).val().trim();
+                var tempFOIR = $('#foir-'+i).val().trim();
+                var tempBlncPrdSnctnTrm = $('#blncPrdSnctnTrm-'+i).val().trim();
+                var tempBrwrImpact = $('#borrowerImpact-'+i).html();
+                
+                var applicableCaseOnBrwr = getCaseTypeOfBrwr(Number(tempBrwrImpact.split('%')[0]), tempBrwrType);
+                if(tempBrwrType === "sal"){
+                    
+                    applicantsObj[i-1] = {
+                        name: tempName,
+                        borrowerType: tempBrwrType, 
+                        latestInc: tempLatestInc,
+                        feb20Inc: tempFeb20Inc,
+                        totalDeduction: tempTotDeduction,
+                        foir: tempFOIR,
+                        blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
+                        impact: tempBrwrImpact,
+                        caseType: applicableCaseOnBrwr
+                    }
+    
+                    console.log("Latest Salary : "+ tempLatestInc);
+                    salariedLatestInc += parseFloat(tempLatestInc);
+                    console.log("i:------> "+salariedLatestInc);
+                    salariedFeb20Inc += parseFloat(tempFeb20Inc);
+                    console.log("i:------> "+salariedFeb20Inc);
                 }
+                if(tempBrwrType === "oth"){             
+                    applicantsObj[i-1] = {
+                        name: tempName,
+                        borrowerType: tempBrwrType,
+                        sector : $('#sector-'+i).val(),
+                        latestInc: tempLatestInc,
+                        feb20Inc: tempFeb20Inc,
+                        totalDeduction: tempTotDeduction,
+                        foir: tempFOIR,
+                        profitYr : $('#netProfitYr-'+i).val(),
+                        profit :  $('#netProfitVal-'+i).val(),
+                        blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
+                        impact: tempBrwrImpact,
+                        caseType: applicableCaseOnBrwr
+                    }
+                    
+                    otherLatestInc += parseFloat(tempLatestInc);
+                    otherFeb20Inc += parseFloat(tempFeb20Inc);
+                }
+            }
+
+        }
+
+
+        if(selectedAccType === "sal" && (applicantsObj.case === "case-2" || stressObj.case === "case-3")){
+               
+                    
+               
         }
 
         if(stressObj.case === "case-8" || stressObj.case === "case-9"){
@@ -876,12 +950,12 @@ $(document).ready(function () {
         calculateFOIR();
         maxOfSchmSnctdLTV = parseFloat(Math.max(sanctLTV.val().trim(), schmLTV.val().trim())).toFixed(2);
        // maxOfBlncTenureRetirementAge = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
-         applicants = [];   
+         applicantsObj = [];   
         if(selectedAccType  === "frr"){
             var latestIncFRR = Number($('#latestInc-1').val().trim()) || 0;
             var feb20IncFRR = Number($('#feb20Inc-1').val().trim()) || 0;
 
-            applicants[0] = {
+            applicantsObj[0] = {
                 name: $('#borrowerName-1').val().trim(),
                 latestInc: latestIncFRR,
                 feb20Inc: feb20IncFRR,
@@ -901,28 +975,20 @@ $(document).ready(function () {
                 stressObj.resolutionFramework = ["R1","R2"];
                 if(LTVObj.case1 <= maxOfSchmSnctdLTV)
                     LTV[0] = LTVObj.case1;
-                // else
-                //     LTV[0] = 0;
                 stressObj.stressType = "Mild Stress";
             }else if(stressPercentageFRR > 40 && stressPercentageFRR < 100){
                 stressObj.case = "case-6";
                 stressObj.resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
                 if(LTVObj.case1 <= maxOfSchmSnctdLTV)
                     LTV[0] = LTVObj.case1;
-                // else
-                //     LTV[0] = 0;
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
-                // else
-                //     LTV[1] = 0;                
+                    LTV[1] = LTVObj.case3;   
                 stressObj.stressType = "Severe Stress";
             }else if(stressPercentageFRR == 100){
                 stressObj.case = "case-11";
                 stressObj.resolutionFramework = ["M2","M2R1","M2R2"];
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0;           
+                    LTV[1] = LTVObj.case3; 
                 stressType = "Severe Stress";
             }else{
                 stressObj.case = "nocase";
@@ -930,15 +996,9 @@ $(document).ready(function () {
             }
             console.log(LTV);
             stressObj.stressPercentage = stressPercentageFRR;
-            //stressObj.acctype = "frr";            
             stressObj.LTV = LTV;
-            stressObj.applicants = applicants;
-           // stressObj.case = caseType;
-           // stressObj.stressType = stressType;
-           // stressObj.resolutionFramework = resolutionFramework; 
+            stressObj.applicants = applicantsObj;
             console.log("stressObj : "+ JSON.stringify(stressObj));
-
-            //console.log("JSON Parse : "+JSON.parse(stressObj));
         }else if(selectedAccType  === "loan"){
             calculateConsolidatedIncome("loan");
            
