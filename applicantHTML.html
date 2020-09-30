@@ -108,3 +108,83 @@
     
   </body>
 </html>
+
+
+
+var borrowerElem = 
+            '<div class="jumbotron">'+
+            '   <div>'+
+            '       <h5 class="alert alert-dark text-center" role="alert">'+
+            '           Applicant #'+ i + 'Details'+
+            '       </h5>'+
+            '   </div>'+
+            '   <div class="row">'+
+            '    <div class="col-sm-6">'+
+            '       <label for="borrowerName-'+ i +'">'+
+            '          Applicant Name'+
+            '       </label>'+
+            '       <input type="text" class="form-control" id="borrowerName-'+ i +'" placeholder="Enter Name">'+
+            '   </div>'+
+            '        <div class="col-sm-3"><label for="borrowerType-'+ i +'">Borrower Type</label>'+
+            '          <select id="borrowerType-'+ i +'" class="form-control" '+isFRR+'>'+
+            '            <option selected value="">Select</option>'+
+            '            <option value="sal">Salaried</option>'+
+            '            <option value="oth">Other Individual</option>'+
+            '          </select>'+
+            '        </div>'+
+            '        <div class="col-sm-3"><label for="sector-'+ i +'">Sector</label>'+
+            '          <select id="sector-'+ i +'" class="form-control" disabled>'+
+            '            <option selected value="">Select</option>'+
+            '          </select>'+
+            '        </div>'+
+            '      </div>'+
+            '      <br />'+
+            '      <div class="row">'+
+            '        <div class="col-sm-3"><label id="lblIncomeLatest-'+ i +'" for="latestInc-'+ i +'">'
+                            +incomeSrc[0]+'</label><input type="tel" class="form-control" id="latestInc-'+ i + '"'+
+            '                  placeholder="Enter Value"></div>'+
+            '        <div class="col-sm-3"><label id="lblIncomeFeb20-'+ i +'" for="feb20Inc-'+ i +'">'
+                            +incomeSrc[1]+'</label><input type="tel" class="form-control" id="feb20Inc-'+ i + '"'+
+            '                  placeholder="Enter Value"></div>'+
+            '        <div class="col-sm-3">'+
+            '          <label for="totalDeduction-'+ i +'">Total Deduction (Except Current EMI)</label>'+
+            '          <input type="tel" class="form-control" id="totalDeduction-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
+            '        </div>'+
+            '        <div class="col-sm-3">'+
+            '          <label for="foir-'+ i +'" data-toggle="tooltip" title="Based on income & schematic guidelines">'+
+            '            Applicable FOIR <sup><span class="badge badge-warning">i</span></sup>'+
+            '          </label>'+
+            '          <input type="tel" class="form-control" id="foir-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
+            '        </div>'+
+            '      </div>'+
+            '      <br/>'+
+            '      <div class="row">'+
+            '        <div class="col-sm-2">'+
+            '          <label for="netProfitYr-'+ i +'">Net Profit Year</label>'+
+            '          <select id="netProfitYr-'+ i +'" class="form-control" '+isFRR+'>'+
+            '            <option selected value="">Select</option>'+
+            '            <option value="yr1920">2019-2020</option>'+
+            '            <option value="yr1819">2018-2019</option>'+
+            '          </select>'+
+            '        </div>'+
+            '        <div class="col-sm-3">'+
+            '          <label for="1819Profit-'+ i +'" data-toggle="tooltip" title="If net profit of FY 2019-20 not available">'+
+            '            100% Net Profit of FY 2018-19 <sup><span class="badge badge-warning">i</span></sup>'+
+            '          </label>'+
+            '          <input type="tel" class="form-control" id="1819Profit-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
+            '        </div>'+
+            '        <div class="col-sm-4">'+
+            '          <label for="blncPrdSnctnTrm-'+ i +'">'+
+            '            Balance period as per sanction terms (in months)'+
+            '          </label>'+
+            '          <input type="tel" class="form-control" id="blncPrdSnctnTrm-'+ i +'" placeholder="Enter Value">'+
+            '        </div>'+
+            '        <div class="col-sm-3" style="text-align:center;">'+
+            '          <label>Percentage Reduction in Salary</label>'+
+            '          <br />'+
+            '          <h3 class="badge badge-danger" style="font-size: x-large;" id="borrowerImpact-'+ i +'"></h3>'+
+            '        </div>'+
+            '      </div>'+
+            '    </div>';
+                
+            

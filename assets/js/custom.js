@@ -1,26 +1,36 @@
 $(document).ready(function () {
 
     /******Variable Initialisation starts here******/
-    window.accObj = {};
-    var LTVObj = {};
-    var resRepPeriod = 0;
-    window.stressObj = {};
+    var accObj = {},
+        LTVObj = {},
+        FOIRObj = {},
+        stressObj = {},
+        resRepPeriod = 0,
+        resolutionFramework = [],
+        //LTV = [],
+        applicantsObj = [];
+
     window.salStressPercentageConsolidated = 0;
     window.othStressPercentageConsolidated = 0;
     var maxOfSchmSnctdLTV = 0;
+    var stressType = "",
+        additionalFOIR = 10,
+        FOIRCap = 80,
+        minFOIR = 50,
+        estIntMoratorium = 0,
+        blncLoanTenureValue =  0;  
+
    // var maxOfBlncTenureRetirementAge = 0;
-    var resolutionFramework = [];
-    var stressType = "";    
-    var LTV = [];
+    
+      
+
     var sanctndAmt =  $('#sanctndAmt'),
         sanctLTV = $('#sanctLTV'),
         schmLTV = $('#schmLTV'),
         prsntOutstdng = $('#prsntOutstdng'),
         valOfSecurity = $('#valOfSecurity'),
         proposedROI = $('#proposedROI'),
-        unsrvcdInt = $('#unsrvcdInt'),
-        estIntMoratorium = 0,
-        blncLoanTenure = $('#blncLoanTenure');
+        unsrvcdInt = $('#unsrvcdInt');
         //estimatedMoratoriumInt = 0;
         //blncPeriodRetirement = $('#blncPeriodRetirement');
 
@@ -74,7 +84,8 @@ $(document).ready(function () {
     var incomeSrc = ["Latest Sal/Rent/GMBR","Sal/Rent/GMBR of Feb 2020"];
     var $accType = $("#accType");
     var $accSchm = $("#accScheme");
-    var $noOfApplicant = $("#noOfApplicant");
+    var $noOfApplicant = $("#noOfApplicant"),
+        selectedAccType = "";
     /******Variable Initialisation ends here******/
 
     /******Default function Initialisation starts here******/
@@ -85,7 +96,7 @@ $(document).ready(function () {
     $accType.change(function () {        
         $noOfApplicant.removeAttr('disabled');
         $noOfApplicant.empty();
-        var selectedAccType = $('option:selected', this).val();
+        selectedAccType = $('option:selected', this).val();
         
         $accSchm.empty();
         $('#applicants').empty(); // reset  borrower/coapplicant div
@@ -110,11 +121,11 @@ $(document).ready(function () {
             
             $('#unsrvcdInt').val("").attr('disabled', true);
             $('#sanctndAmt').removeAttr("disabled");
-            $('#blncLoanTenure').removeAttr("disabled");
+           // $('#blncLoanTenure').removeAttr("disabled");
         } else if ("frr" === selectedAccType) {
             isFRR = "disabled";
             $accSchm.append($("<option></option>")
-                .attr("value", "frr").text("FRR")
+                .attr("value", "FRR").text("FRR")
             );
             $accSchm.attr('disabled', true);
 
@@ -125,7 +136,7 @@ $(document).ready(function () {
             
             $('#unsrvcdInt').val("").attr('disabled', true);
             $('#sanctndAmt').val("").attr('disabled', true);
-            $('#blncLoanTenure').val("").attr('disabled', true);
+          //  $('#blncLoanTenure').val("").attr('disabled', true);
             incomeSrc =  ["Latest Rent", "Rent in Feb 2020"];
         } else if ("od" === selectedAccType) {
             //isOD= "";
@@ -146,7 +157,7 @@ $(document).ready(function () {
 
             $('#unsrvcdInt').removeAttr("disabled");
             $('#sanctndAmt').removeAttr("disabled");
-            $('#blncLoanTenure').removeAttr("disabled");            
+           // $('#blncLoanTenure').removeAttr("disabled");            
         } else {
             $accSchm.attr('disabled', true);
         }
@@ -162,7 +173,7 @@ $(document).ready(function () {
             '<div class="jumbotron">'+
             '   <div>'+
             '       <h5 class="alert alert-dark text-center" role="alert">'+
-            '           Applicant #'+ i + 'Details'+
+            '           Applicant #'+ i + ' Details'+
             '       </h5>'+
             '   </div>'+
             '   <div class="row">'+
@@ -187,19 +198,19 @@ $(document).ready(function () {
             '      </div>'+
             '      <br />'+
             '      <div class="row">'+
-            '        <div class="col-sm-3"><label id="lblIncomeLatest-'+ i +'" for="latestInc-'+ i +
-            '                  ">'+incomeSrc[0]+'</label><input type="tel" class="form-control" id="latestInc-'+ i +
-            '                  " placeholder="Enter Value"></div>'+
-            '        <div class="col-sm-3"><label id="lblIncomeFeb20-'+ i +'" for="feb20Inc-'+ i +
-            '                  ">'+incomeSrc[1]+'</label><input type="tel" class="form-control" id="feb20Inc-'+ i +
-            '                  " placeholder="Enter Value"></div>'+
+            '        <div class="col-sm-3"><label id="lblIncomeLatest-'+ i +'" for="latestInc-'+ i +'">'
+                            +incomeSrc[0]+'</label><input type="tel" class="form-control" id="latestInc-'+ i + '"'+
+            '                  placeholder="Enter Value"></div>'+
+            '        <div class="col-sm-3"><label id="lblIncomeFeb20-'+ i +'" for="feb20Inc-'+ i +'">'
+                            +incomeSrc[1]+'</label><input type="tel" class="form-control" id="feb20Inc-'+ i + '"'+
+            '                  placeholder="Enter Value"></div>'+
             '        <div class="col-sm-3">'+
             '          <label for="totalDeduction-'+ i +'">Total Deduction (Except Current EMI)</label>'+
             '          <input type="tel" class="form-control" id="totalDeduction-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
             '        <div class="col-sm-3">'+
             '          <label for="foir-'+ i +'" data-toggle="tooltip" title="Based on income & schematic guidelines">'+
-            '            Applicable FOIR <sup><span class="badge badge-warning">i</span></sup>'+
+            '            Applicable FOIR <sup><span class="badge btn-bob">i</span></sup>'+
             '          </label>'+
             '          <input type="tel" class="form-control" id="foir-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
@@ -215,10 +226,10 @@ $(document).ready(function () {
             '          </select>'+
             '        </div>'+
             '        <div class="col-sm-3">'+
-            '          <label for="1819Profit-'+ i +'" data-toggle="tooltip" title="If net profit of FY 2019-20 not available">'+
-            '            100% Net Profit of FY 2018-19 <sup><span class="badge badge-warning">i</span></sup>'+
+            '          <label for="netProfitVal-'+ i +'" data-toggle="tooltip" title="If net profit of FY 2019-20 not available">'+
+            '            100% Net Profit <span id="year-'+ i +'"></span> <sup><span class="badge btn-bob">i</span></sup>'+
             '          </label>'+
-            '          <input type="tel" class="form-control" id="1819Profit-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
+            '          <input type="tel" class="form-control" id="netProfitVal-'+ i +'" placeholder="Enter Value" '+isFRR+'>'+
             '        </div>'+
             '        <div class="col-sm-4">'+
             '          <label for="blncPrdSnctnTrm-'+ i +'">'+
@@ -229,7 +240,7 @@ $(document).ready(function () {
             '        <div class="col-sm-3" style="text-align:center;">'+
             '          <label>Percentage Reduction in Salary</label>'+
             '          <br />'+
-            '          <h3 class="badge badge-danger" style="font-size: x-large;" id="borrowerImpact-1s"></h3>'+
+            '          <h3 class="badge badge-danger" style="font-size: x-large;" id="borrowerImpact-'+ i +'"></h3>'+
             '        </div>'+
             '      </div>'+
             '    </div>';
@@ -262,19 +273,19 @@ $(document).ready(function () {
             //     '"></h3></div></div></div>';
             $('#applicants').append(borrowerElem);
             $('#lblfoir-'+i).tooltip();
-            $("label[for='1819Profit-"+i+"']").tooltip();
+            $("label[for='netProfitVal-"+i+"']").tooltip();
             $("label[for='foir-"+i+"']").tooltip();
             $("label[for='blncPrdSnctnTrm-"+i+"']").tooltip();            
-            $('#lbl1819Profit-'+i).tooltip();
+            $('#lblNetProfitVal-'+i).tooltip();
         }
 
 
         $( "input[id^='feb20Inc']" ).blur(function (){
             var elemIndex = $(this).attr('id').split('-')[1];
             console.log("Element Index : "+elemIndex);
-            var stressValue = calculateStress($('#latestInc-'+elemIndex).val(), $(this).val());
-            console.log(stressValue);
-            $('#borrowerImpact-'+elemIndex).html(stressValue+'%');
+            //var stressValue = calculateStress(Number($('#latestInc-'+elemIndex).val()), Number($(this).val()));
+            console.log(calculateStress(Number($('#latestInc-'+elemIndex).val()), Number($(this).val())));
+            $('#borrowerImpact-'+elemIndex).html(calculateStress(Number($('#latestInc-'+elemIndex).val()), Number($(this).val()))+'%');
 
         });
 
@@ -286,12 +297,13 @@ $(document).ready(function () {
         });
         
         $("[id^='netProfitYr']" ).change(function () {
+            var elemIndex = $(this).attr('id').split('-')[1];
             var selectedYr = $('option:selected', this).val();
             if(selectedYr === 'yr1920')
-                $('#year').text('of 2019-2020');
+                $('#year-'+elemIndex).html('of FY 2019-20');
             else
-                $('#year').text('of 2018-2019');
-            console.log($('option:selected', this).val());
+                $('#year-'+elemIndex).html('of FY 2018-19');
+            console.log($('option:selected', this).val() +"\n Index is: "+elemIndex);
         });
             
         $("[id^='borrowerType']" ).change(function () {
@@ -304,7 +316,7 @@ $(document).ready(function () {
             if(selectedBorrowerType === "sal"){
                 $('#lblIncomeLatest-'+elemIndex).text("Latest Salary");
                 $('#lblIncomeFeb20-'+elemIndex).text("Salary in Feb 2020");
-                $('#1920Profit-'+elemIndex).val("").attr('disabled', true);
+                $('#netProfitVal-'+elemIndex).val("").attr('disabled', true);
                 $('#netProfitYr-'+elemIndex).val("").attr('disabled', true);
                 $('#sector-'+elemIndex).val("").attr('disabled', true);
                 $("#sector-"+elemIndex).append($("<option></option>")
@@ -318,7 +330,7 @@ $(document).ready(function () {
 
                 $('#lblIncomeLatest-'+elemIndex).text("Latest GMBR");
                 $('#lblIncomeFeb20-'+elemIndex).text("Previous GMBR");
-                $('#1920Profit-'+elemIndex).val("").removeAttr('disabled')
+                $('#netProfitVal-'+elemIndex).val("").removeAttr('disabled')
                 $('#netProfitYr-'+elemIndex).val("").removeAttr('disabled')
             }else{
                 $('#lblIncomeLatest-'+elemIndex).text("");
@@ -342,18 +354,18 @@ $(document).ready(function () {
     };
 
     /*******Account level object creation starts here********/
-    var accSchmSelectedVal = "";
+    accSchmSelectedVal = "";
     function createAccObject(){
         accObj = {};
         console.log("Inside Create Acc Object Function : "+$accType.val());
-        var accType = $accType.val(),            
-            accNo = $('#accNo').val().trim();
+        //var accType = $accType.val(),            
+        accNo = $('#accNo').val().trim();
         accSchmSelectedVal = $accSchm.val();
-        console.log("SKYYYYYYYYY  accSchmSelectedVal = $accSchm.val(); :"+  accSchmSelectedVal);
+        //console.log("SKYYYYYYYYY  accSchmSelectedVal = $accSchm.val(); :"+  accSchmSelectedVal);
         if(accType == null || accType == ""){
             alert("Error! Please select account type");
         }else{
-            accObj.accType =  accType;
+            accObj.accType =  selectedAccType;
         }
         
         if(accSchmSelectedVal == "" || accSchmSelectedVal == null){
@@ -367,16 +379,22 @@ $(document).ready(function () {
         }else{
             accObj.accNo = accNo;
         }
-        accObj.AppNo = $noOfApplicant.val();
+        
         accObj.sanctndAmt = sanctndAmt.val().trim();
-        accObj.sanctLTV = sanctLTV.val().trim();
-        accObj.schmLTV = schmLTV.val().trim();
         accObj.prsntOutstdng = prsntOutstdng.val().trim();
         accObj.valOfSecurity = valOfSecurity.val().trim();
         accObj.proposedROI = proposedROI.val().trim();
-        accObj.unsrvcdInt = unsrvcdInt.val().trim();
         accObj.estIntMoratorium = estIntMoratorium;
-        accObj.blncLoanTenure = blncLoanTenure.val().trim();
+        accObj.blncLoanTenure = blncLoanTenureValue;
+        accObj.sanctLTV = sanctLTV.val().trim();        
+        accObj.schmLTV = schmLTV.val().trim();
+        accObj.fitlRepTenure = $('#fitlRepTenure').val().trim();
+        accObj.unsrvcdInt = unsrvcdInt.val().trim();
+        accObj.prsntEMI = $('#prsntEMI').val().trim();
+        accObj.fitlMorat = $('#fitlMorat').val().trim();
+        accObj.loanMorat = $('#loanMorat').val().trim();
+        accObj.AppNo = $noOfApplicant.val() || 0;
+        
         //accObj.blncPeriodRetirement = blncPeriodRetirement.val().trim();
         console.log("Account Level Object : "+ JSON.stringify(accObj));
 
@@ -409,6 +427,7 @@ $(document).ready(function () {
     //     otherFeb20Inc = 0;
    
     function calculateConsolidatedIncome(accType){
+        applicants = [];
         var consolidatedCaseType = "";
         salStressPercentageConsolidated = 0;
         othStressPercentageConsolidated = 0;
@@ -417,18 +436,55 @@ $(document).ready(function () {
             otherLatestInc = 0,
             otherFeb20Inc = 0,
             noOfApplicant = $noOfApplicant.val();
-
+        var applicants = []
         for(i=1; i<=noOfApplicant; i++){
-            if($('#borrowerType-'+i).val() === "sal"){
-                console.log("Latest Salary : "+ $('#latestInc-'+i).val().trim());
-                salariedLatestInc += parseFloat($('#latestInc-'+i).val().trim());
+            
+            var tempLatestInc = Number($('#latestInc-'+i).val().trim()) || 0;
+            var tempFeb20Inc = Number($('#feb20Inc-'+i).val().trim()) || 0;
+            var tempBrwrType = $('#borrowerType-'+i).val() || "";
+
+            var tempName = $('#borrowerName-'+i).val().trim();
+            var tempTotDeduction = $('#totalDeduction-'+i).val().trim();
+            var tempFOIR = $('#foir-'+i).val().trim();
+            var tempBlncPrdSnctnTrm = $('#blncPrdSnctnTrm-'+i).val().trim();
+            var tempBrwrImpact = $('#borrowerImpact-'+i).html();
+
+            if(tempBrwrType === "sal"){
+
+                applicants[i-1] = {
+                    name: tempName,
+                    borrowerType: tempBrwrType, 
+                    latestInc: tempLatestInc,
+                    feb20Inc: tempFeb20Inc,
+                    totalDeduction: tempTotDeduction,
+                    foir: tempFOIR,
+                    blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
+                    impact: tempBrwrImpact
+                }
+
+                console.log("Latest Salary : "+ tempLatestInc);
+                salariedLatestInc += parseFloat(tempLatestInc);
                 console.log("i:------> "+salariedLatestInc);
-                salariedFeb20Inc += parseFloat($('#feb20Inc-'+i).val().trim());
+                salariedFeb20Inc += parseFloat(tempFeb20Inc);
                 console.log("i:------> "+salariedFeb20Inc);
             }
-            if($('#borrowerType-'+i).val() === "oth"){
-                otherLatestInc += parseFloat($('#latestInc-'+i).val().trim());
-                otherFeb20Inc += parseFloat($('#feb20Inc-'+i).val().trim());
+            if(tempBrwrType === "oth"){             
+                applicants[i-1] = {
+                    name: tempName,
+                    borrowerType: tempBrwrType,
+                    sector : $('#sector-'+i).val(),
+                    latestInc: tempLatestInc,
+                    feb20Inc: tempFeb20Inc,
+                    totalDeduction: $('#totalDeduction-'+i).val().trim(),
+                    foir: $('#foir-'+i).val().trim(),
+                    profitYr : $('#netProfitYr-'+i).val(),
+                    profit :  $('#netProfitVal-'+i).val(),
+                    blncPrdSnctnTrm: $('#blncPrdSnctnTrm-'+i).val().trim(),
+                    impact: $('#borrowerImpact-'+i).html()
+                }
+                
+                otherLatestInc += parseFloat(tempLatestInc);
+                otherFeb20Inc += parseFloat(tempFeb20Inc);
             }
         }
         salStressPercentageConsolidated = calculateStress(salariedLatestInc, salariedFeb20Inc) || 0;
@@ -612,7 +668,8 @@ $(document).ready(function () {
         stressObj.stressType = stressType;
         stressObj.LTV = LTV;
         stressObj.resolutionFramework = resolutionFramework; 
-        stressObj.acctype = accType;
+        stressObj.applicants = applicants;
+        //stressObj.acctype = accType;
         console.log("stressObj for Loan and OD : "+ JSON.stringify(stressObj));
 
         
@@ -725,7 +782,20 @@ $(document).ready(function () {
         return (fv_value);
     }
 
+    //Calculator 5
     function calculateFOIR(){
+        if(stressObj.case === "case-2" || stressObj.case === "case-3" || 
+            stressObj.case === "case-5" || stressObj.case === "case-6"){
+
+        }
+
+        if(stressObj.case === "case-8" || stressObj.case === "case-9"){
+
+        }
+
+        if(stressObj.case === "case-10" || stressObj.case === "case-11"){
+
+        }
 
     }
 
@@ -745,7 +815,7 @@ $(document).ready(function () {
         if(accSchmSelectedVal === "MLOD"){
             resRepPeriod = Math.min(144, minimumOfApplicantBlncPeriod);
         }else{
-            resRepPeriod = Math.max(Number(blncLoanTenure.val().trim()), Number(minimumOfApplicantBlncPeriod));
+            resRepPeriod = Math.max(blncLoanTenureValue, Number(minimumOfApplicantBlncPeriod));
             if(resRepPeriod > 180)
                 resRepPeriod = resRepPeriod;
         }
@@ -757,13 +827,39 @@ $(document).ready(function () {
 
     //Calculator 4
     function calculateMaxExtension(){
-        
+        var temp = resRepPeriod - blncLoanTenureValue;
+        if(accSchmSelectedVal === "HL" || accSchmSelectedVal === "TL" || accSchmSelectedVal === "ELWS"
+        || accSchmSelectedVal === "ELWoS" || accSchmSelectedVal === "HLOD"){            
+            if(temp <= 24 ){
+                stressObj.maxExtension = true;
+                stressObj.maxExtensionVal = temp; 
+            }else{
+                stressObj.maxExtension = false;
+                stressObj.maxExtensionVal = temp; 
+            }
+                
+        }else if(accSchmSelectedVal === "PL" || accSchmSelectedVal === "AL" || accSchmSelectedVal === "ML"
+                || accSchmSelectedVal === "LL"  || accSchmSelectedVal === "GL"  || accSchmSelectedVal === "MLOD"
+                || accSchmSelectedVal === "PLOD"  || accSchmSelectedVal === "FRR"){
+            if(temp <= 18 ){
+                stressObj.maxExtension = true;
+                stressObj.maxExtensionVal = temp; 
+            }else{
+                stressObj.maxExtension = false;
+                stressObj.maxExtensionVal = temp; 
+            }
+        }else{
+            stressObj.maxExtension = "Error in CalculateMaxExtensionFunction";
+            stressObj.maxExtensionVal = "Error in CalculateMaxExtensionFunction";
+        }
+
     }
 
     //function 
     /****************Calculations Starts Here*************** */
     $('#btnCalculate').click(function(){
-        var accountType = $accType.val(); 
+        blncLoanTenureValue = Number($('#blncLoanTenure').val().trim())
+        //var accountType = $accType.val(); 
         stressObj = {}; //resetting global variable
         resolutionFramework = []; //resetting global variable
         stressType = ""; //resetting global variable
@@ -773,9 +869,19 @@ $(document).ready(function () {
 
         maxOfSchmSnctdLTV = parseFloat(Math.max(sanctLTV.val().trim(), schmLTV.val().trim())).toFixed(2);
        // maxOfBlncTenureRetirementAge = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
-            
-        if(accountType  === "frr"){
-            var stressPercentageFRR = calculateStress($('#latestInc-1').val().trim(), $('#feb20Inc-1').val().trim()) || 0;
+         applicants = [];   
+        if(selectedAccType  === "frr"){
+            var latestIncFRR = Number($('#latestInc-1').val().trim()) || 0;
+            var feb20IncFRR = Number($('#feb20Inc-1').val().trim()) || 0;
+
+            applicants[0] = {
+                name: $('#borrowerName-1').val().trim(),
+                latestInc: latestIncFRR,
+                feb20Inc: feb20IncFRR,
+                blncPrdSnctnTrm: $('#blncPrdSnctnTrm-1').val().trim()
+            }
+           
+            var stressPercentageFRR = calculateStress(latestIncFRR, feb20IncFRR) || 0;
             //var caseType = "";
             console.log("maxOfSchmSnctdLTV : "+maxOfSchmSnctdLTV);
            // console.log("maxOfBlncTenureRetirementAge : "+maxOfBlncTenureRetirementAge);
@@ -817,18 +923,19 @@ $(document).ready(function () {
             }
             console.log(LTV);
             stressObj.stressPercentage = stressPercentageFRR;
-            stressObj.acctype = "frr";            
+            //stressObj.acctype = "frr";            
             stressObj.LTV = LTV;
+            stressObj.applicants = applicants;
            // stressObj.case = caseType;
            // stressObj.stressType = stressType;
            // stressObj.resolutionFramework = resolutionFramework; 
             console.log("stressObj : "+ JSON.stringify(stressObj));
 
             //console.log("JSON Parse : "+JSON.parse(stressObj));
-        }else if(accountType  === "loan"){
+        }else if(selectedAccType  === "loan"){
             calculateConsolidatedIncome("loan");
            
-        }else if(accountType  === "od"){
+        }else if(selectedAccType  === "od"){
             calculateConsolidatedIncome("od");
         }else{
             
