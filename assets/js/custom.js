@@ -1,5 +1,6 @@
+'use strict';
 $(document).ready(function () {
-
+    
     /******Variable Initialisation starts here******/
     var accObj = {},
         LTVObj = {},
@@ -7,7 +8,7 @@ $(document).ready(function () {
         stressObj = {},
         resRepPeriod = 0,
         resolutionFramework = [],
-        //LTV = [],
+        LTV = [],
         applicantsObj = [];
 
     window.salStressPercentageConsolidated = 0;
@@ -18,7 +19,8 @@ $(document).ready(function () {
         FOIRCap = 80,
         minFOIR = 50,
         estIntMoratorium = 0,
-        blncLoanTenureValue =  0;  
+        blncLoanTenureValue =  0,
+        accSchmSelectedVal = "";  
 
    // var maxOfBlncTenureRetirementAge = 0;
     
@@ -354,12 +356,12 @@ $(document).ready(function () {
     };
 
     /*******Account level object creation starts here********/
-    accSchmSelectedVal = "";
+    
     function createAccObject(){
         accObj = {};
         console.log("Inside Create Acc Object Function : "+$accType.val());
         //var accType = $accType.val(),            
-        accNo = $('#accNo').val().trim();
+        var accNo = $('#accNo').val().trim(),
         accSchmSelectedVal = $accSchm.val();
         //console.log("SKYYYYYYYYY  accSchmSelectedVal = $accSchm.val(); :"+  accSchmSelectedVal);
         if(accType == null || accType == ""){
@@ -415,36 +417,96 @@ $(document).ready(function () {
         calculateMaxResRepPeriod();
     }
    
-
-    // This function is used to assign case type to individual borrower of a loan 
+    var combinedRepaymentCapacity = 0,
+        combinedOutsideObligation = 0,
+        maxEMI = 0;
+    // This function is used to assign case type to SALARIED individual borrower of a loan 
     // to faclitate in calculation of FOIR for everybody individually
-    function getCaseTypeOfBrwr(stressPercentage, brwrType){
-        if(brwrType === "sal"){
-            if(stressPercentage >= 0 && stressPercentage <= 25)
-                return "case-1";
-            if(stressPercentage > 25 && stressPercentage <= 40)
-                return "case-2";
-            if(stressPercentage > 40 && stressPercentage < 100)
-                return "case-3";
-            if(stressPercentage == 100)
-                return "case-10";
-        }else if(brwrType === "oth"){
-            if(stressPercentage >=0 && stressPercentage < 50)
-                return "case-7";
-            if(stressPercentage >= 50 && stressPercentage < 100)
-                return "case-8";
-            if(stressPercentage == 100)
-                return "case-9";
+    function getFOIROfSalIndividual(stressPercentage, latestInc, feb20Inc, maxFOIR, total_deduction){
+        FOIRObj = {}
+        //var maxFOIR = (Math.min((Number(applicable_foir)+10), FOIRCap /*declared globally and is set to 80 */))/100;
+        //console.log("maxFOIR calculated is : "+ maxFOIR);
+        console.log("SALARIED stressPercentage : "+stressPercentage +"\n latestInc: "+latestInc+"\n feb20Inc: "+feb20Inc);
+            if(stressPercentage >= 0 && stressPercentage <= 25){
+                console.log("CASE 1 OF SALARIED of getFOIROfSalIndividual");
+                return {case_type: "case-1"};
+            }else if(stressPercentage > 25 && stressPercentage <= 40){
+                //return "case-2";
+                console.log("CASE 2 OF SALARIED of getFOIROfSalIndividual");
+                FOIRObj["upto24Month"] = latestInc;
+                FOIRObj["after24Months"] = feb20Inc;
+                FOIRObj["case_type"] = "case-2"
+            }else if(stressPercentage > 40 && stressPercentage < 100){
+                //return "case-3";
+                FOIRObj["upto24Month"] = latestInc;
+                FOIRObj["after24Months"] = feb20Inc;
+                FOIRObj["case_type"] = "case-3"
 
-        }else{
-            return "Error in getCaseTypeOfBrwr Function";
-        }
+            }else if(stressPercentage == 100){
+                console.log("CASE 10 OF SALARIED of getFOIROfSalIndividual");
+                FOIRObj["upto24Month"] = feb20Inc * .75;
+                FOIRObj["after24Months"] = feb20Inc;
+                FOIRObj["case_type"] = "case-10"
+            }else{
+                console.log("NO CASE OF SALARIED of getFOIROfSalIndividual");                
+            }
+            combinedRepaymentCapacity += FOIRObj["upto24Month"];
+            combinedOutsideObligation += total_deduction;
+            console.log("SALARIED Combined repayment capacity : "+ combinedRepaymentCapacity);
+            //console.log("TYPE OF FOIRObj['upto24Month'] : "+ typeof FOIRObj["upto24Month"]);
+            FOIRObj["max_monthly_payment"] = FOIRObj["upto24Month"] * maxFOIR;
+            FOIRObj["totalPermissibleDeduction"] = total_deduction;
+            FOIRObj["available_capacity"] = FOIRObj["max_monthly_payment"] - total_deduction;
+            maxEMI += FOIRObj["available_capacity"];
+            //console.log("FOIRObj inside getFOIROfSalIndividual function : "+ JSON.stringify(FOIRObj));
+            return FOIRObj;
     }
+
+
+    // This function is used to assign case type to SALARIED individual borrower of a loan 
+    // to faclitate in calculation of FOIR for everybody individually
+    function getFOIROfOthIndividual(stressPercentage, profitYr, profitval, maxFOIR, total_deduction){
+        FOIRObj = {}
+        if(stressPercentage >=0 && stressPercentage < 50){
+            console.log("CASE 7 OF OTHER of getFOIROfOthIndividual");
+            return {case_type: "case-7"};
+        }else if(stressPercentage >= 50 && stressPercentage <= 100){
+            //return "case-8";
+            FOIRObj["case_type"] = "case-8_9"
+            console.log("CASE 8 and 9 OF OTHER of getFOIROfOthIndividual");
+            if(profitYr === "yr1920"){
+                FOIRObj["upto24Month"] = (profitval/12) * .85;
+                FOIRObj["after24Months"] = profitval/12;
+            }else if(profitYr === "yr1819"){
+                FOIRObj["upto24Month"] = (profitval/12) * .80;
+                FOIRObj["after24Months"] = profitval/12;
+            }else{
+                console.log("NO CASE OF OTHER of getFOIROfSalIndividual");                
+            }
+            
+        }   
+        combinedRepaymentCapacity += FOIRObj["upto24Month"];
+        combinedOutsideObligation += total_deduction;
+        console.log("SALARIED Combined repayment capacity : "+ combinedRepaymentCapacity);
+        //console.log("TYPE OF FOIRObj['upto24Month'] : "+ typeof FOIRObj["upto24Month"]);
+        FOIRObj["max_monthly_payment"] = FOIRObj["upto24Month"] * maxFOIR;
+        FOIRObj["totalPermissibleDeduction"] = total_deduction;
+        FOIRObj["available_capacity"] = FOIRObj["max_monthly_payment"] - total_deduction;
+        maxEMI += FOIRObj["available_capacity"];
+        //console.log("FOIRObj inside getFOIROfOthIndividual function: "+ JSON.stringify(FOIRObj));
+        return FOIRObj;
+        
+    }
+
+
 
     function calculateConsolidatedIncome(accType){
         //applicantsObj = [];
-        var consolidatedCaseType = "";
-        salStressPercentageConsolidated = 0;
+        combinedRepaymentCapacity= 0;
+        combinedOutsideObligation = 0;
+        maxEMI = 0;
+        var consolidatedCaseType = "",
+        salStressPercentageConsolidated = 0,
         othStressPercentageConsolidated = 0;
         var salariedLatestInc = 0,
             salariedFeb20Inc = 0,
@@ -452,30 +514,40 @@ $(document).ready(function () {
             otherFeb20Inc = 0,
             noOfApplicant = $noOfApplicant.val();
         //var applicantsObj = []
-        for(i=1; i<=noOfApplicant; i++){
-            
+        for(var i=1; i<=noOfApplicant; i++){
+            //FOIRObj = [];
             var tempLatestInc = Number($('#latestInc-'+i).val().trim()) || 0;
             var tempFeb20Inc = Number($('#feb20Inc-'+i).val().trim()) || 0;
             var tempBrwrType = $('#borrowerType-'+i).val() || "";
 
             var tempName = $('#borrowerName-'+i).val().trim();
-            var tempTotDeduction = $('#totalDeduction-'+i).val().trim();
-            var tempFOIR = $('#foir-'+i).val().trim();
-            var tempBlncPrdSnctnTrm = $('#blncPrdSnctnTrm-'+i).val().trim();
+            var tempTotDeduction = Number($('#totalDeduction-'+i).val().trim());
+            var tempFOIRApplicable = $('#foir-'+i).val().trim();
+            var tempBlncPrdSnctnTrm = Number($('#blncPrdSnctnTrm-'+i).val().trim());
             var tempBrwrImpact = $('#borrowerImpact-'+i).html();
-            var applicableCaseOnBrwr = getCaseTypeOfBrwr(Number(tempBrwrImpact.split('%')[0]), tempBrwrType);
+            var maxFOIR = 0;
+            //var applicableCaseOnBrwr = getCaseTypeOfBrwr(Number(tempBrwrImpact.split('%')[0]), tempBrwrType);
+            
             if(tempBrwrType === "sal"){
-                
+                maxFOIR = (Math.min((Number(tempFOIRApplicable)+10), FOIRCap /*declared globally and is set to 80 */))/100;
+                console.log("maxFOIR calculated in SALARIED SECTION IS is : "+ maxFOIR);
+                var tempFOIRSal = getFOIROfSalIndividual(
+                                    /* @param borrower salary impact */     Number(tempBrwrImpact.split('%')[0]), 
+                                    /* @param latest salary */              tempLatestInc, 
+                                    /* @param february 2020 salary*/        tempFeb20Inc,
+                                    /* @param max FOIR calculated*/         maxFOIR,
+                                    /* @param total deudction entered */    tempTotDeduction
+                                );
+                console.log("Inside Consolidated SALARIED part and printing FOIR : "+tempFOIRSal);
                 applicantsObj[i-1] = {
                     name: tempName,
                     borrowerType: tempBrwrType, 
                     latestInc: tempLatestInc,
                     feb20Inc: tempFeb20Inc,
-                    totalDeduction: tempTotDeduction,
-                    foir: tempFOIR,
+                    foir: tempFOIRSal,
                     blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
-                    impact: tempBrwrImpact,
-                    caseType: applicableCaseOnBrwr
+                    impact: tempBrwrImpact
+                    //caseType: applicableCaseOnBrwr,
                 }
 
                 console.log("Latest Salary : "+ tempLatestInc);
@@ -484,7 +556,19 @@ $(document).ready(function () {
                 salariedFeb20Inc += parseFloat(tempFeb20Inc);
                 console.log("i:------> "+salariedFeb20Inc);
             }
-            if(tempBrwrType === "oth"){             
+            if(tempBrwrType === "oth"){    
+                maxFOIR = (Math.min((Number(tempFOIRApplicable)+10), FOIRCap /*declared globally and is set to 80 */))/100;
+                console.log("maxFOIR calculated in OTHER SECTION IS is : "+ maxFOIR);
+                var tempNetProfitYr = $('#netProfitYr-'+i).val();
+                var tempNetProfitVal = Number($('#netProfitVal-'+i).val());
+                var tempFOIROth = getFOIROfOthIndividual(
+                                    /* @param borrower salary impact */     Number(tempBrwrImpact.split('%')[0]), 
+                                    /* @param Year of Net Profit */         tempNetProfitYr, 
+                                    /* @param Net profit value */           tempNetProfitVal,
+                                    /* @param applicable FOIR entered*/     maxFOIR,
+                                    /* @param total deudction entered */    tempTotDeduction
+                                );
+                console.log("Inside Consolidated OTHER part and printing FOIR : "+tempFOIROth);
                 applicantsObj[i-1] = {
                     name: tempName,
                     borrowerType: tempBrwrType,
@@ -492,18 +576,30 @@ $(document).ready(function () {
                     latestInc: tempLatestInc,
                     feb20Inc: tempFeb20Inc,
                     totalDeduction: tempTotDeduction,
-                    foir: tempFOIR,
-                    profitYr : $('#netProfitYr-'+i).val(),
-                    profit :  $('#netProfitVal-'+i).val(),
+                    foir: tempFOIROth,
+                    profitYr : tempNetProfitYr,
+                    profit :  tempNetProfitVal,
                     blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
                     impact: tempBrwrImpact,
-                    caseType: applicableCaseOnBrwr
+                   // caseType: applicableCaseOnBrwr
                 }
                 
                 otherLatestInc += parseFloat(tempLatestInc);
                 otherFeb20Inc += parseFloat(tempFeb20Inc);
             }
         }
+
+        console.log("COMBINED REPAYMENT CAPACITY : "+ combinedRepaymentCapacity);
+        stressObj.repaymentOnPresentIncome = {
+            combinedRepaymentCapacity : combinedRepaymentCapacity || 0,
+            combinedOutsideObligation : combinedOutsideObligation || 0,
+            maxEMI : maxEMI || 0,
+            minEMI : (.5 * combinedRepaymentCapacity)-combinedOutsideObligation || 0
+        }
+        // stressObj.combinedRepaymentCapacity = combinedRepaymentCapacity || 0;
+        // stressObj.combinedOutsideObligation = combinedOutsideObligation || 0;
+        // stressObj.maxEMI = maxEMI || 0;
+        // stressObj.minEMI = (.5 * combinedRepaymentCapacity)-combinedOutsideObligation || 0;
         salStressPercentageConsolidated = calculateStress(salariedLatestInc, salariedFeb20Inc) || 0;
         othStressPercentageConsolidated = calculateStress(otherLatestInc, otherFeb20Inc) || 0;
         console.log("salStressPercentageConsolidated: "+salStressPercentageConsolidated);
@@ -799,87 +895,7 @@ $(document).ready(function () {
         return (fv_value);
     }
 
-    //Calculator 5
     
-    function calculateFOIR(){
-        FOIRObj = {};
-        var applicantFOIR = [];
-        if(selectedAccType === "frr" && (stressObj.case === "case-5"  || stressObj.case === "case-6")){
-            FOIRObj.upto_month24 = $('#latestInc-1').val().trim();
-            FOIRObj.after_month24 = $('#feb20Inc-1').val().trim();
-            console.log("FOIRObj inside FRR : "+ FOIRObj);
-        }else{
-            for(i=1; i<=noOfApplicant; i++){
-                var tempLatestInc = Number($('#latestInc-'+i).val().trim()) || 0;
-                var tempFeb20Inc = Number($('#feb20Inc-'+i).val().trim()) || 0;
-                var tempBrwrType = $('#borrowerType-'+i).val() || "";
-
-                var tempTotDeduction = $('#totalDeduction-'+i).val().trim();
-                var tempFOIR = $('#foir-'+i).val().trim();
-                var tempBlncPrdSnctnTrm = $('#blncPrdSnctnTrm-'+i).val().trim();
-                var tempBrwrImpact = $('#borrowerImpact-'+i).html();
-                
-                var applicableCaseOnBrwr = getCaseTypeOfBrwr(Number(tempBrwrImpact.split('%')[0]), tempBrwrType);
-                if(tempBrwrType === "sal"){
-                    
-                    applicantsObj[i-1] = {
-                        name: tempName,
-                        borrowerType: tempBrwrType, 
-                        latestInc: tempLatestInc,
-                        feb20Inc: tempFeb20Inc,
-                        totalDeduction: tempTotDeduction,
-                        foir: tempFOIR,
-                        blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
-                        impact: tempBrwrImpact,
-                        caseType: applicableCaseOnBrwr
-                    }
-    
-                    console.log("Latest Salary : "+ tempLatestInc);
-                    salariedLatestInc += parseFloat(tempLatestInc);
-                    console.log("i:------> "+salariedLatestInc);
-                    salariedFeb20Inc += parseFloat(tempFeb20Inc);
-                    console.log("i:------> "+salariedFeb20Inc);
-                }
-                if(tempBrwrType === "oth"){             
-                    applicantsObj[i-1] = {
-                        name: tempName,
-                        borrowerType: tempBrwrType,
-                        sector : $('#sector-'+i).val(),
-                        latestInc: tempLatestInc,
-                        feb20Inc: tempFeb20Inc,
-                        totalDeduction: tempTotDeduction,
-                        foir: tempFOIR,
-                        profitYr : $('#netProfitYr-'+i).val(),
-                        profit :  $('#netProfitVal-'+i).val(),
-                        blncPrdSnctnTrm: tempBlncPrdSnctnTrm,
-                        impact: tempBrwrImpact,
-                        caseType: applicableCaseOnBrwr
-                    }
-                    
-                    otherLatestInc += parseFloat(tempLatestInc);
-                    otherFeb20Inc += parseFloat(tempFeb20Inc);
-                }
-            }
-
-        }
-
-
-        if(selectedAccType === "sal" && (applicantsObj.case === "case-2" || stressObj.case === "case-3")){
-               
-                    
-               
-        }
-
-        if(stressObj.case === "case-8" || stressObj.case === "case-9"){
-
-        }
-
-        if(stressObj.case === "case-10" || stressObj.case === "case-11"){
-
-        }
-        
-    }
-
 
     console.log("accSchmSelectedVal before calculateMaxResRepPeriod() function: "+ accSchmSelectedVal);
     //Calculator 3
@@ -947,11 +963,12 @@ $(document).ready(function () {
         LTV = [];
         createAccObject(); //To Create Account level object
         calculateLTV(); //To Calculate LTV for all scenario
-        calculateFOIR();
+        //calculateFOIR();
         maxOfSchmSnctdLTV = parseFloat(Math.max(sanctLTV.val().trim(), schmLTV.val().trim())).toFixed(2);
        // maxOfBlncTenureRetirementAge = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
          applicantsObj = [];   
         if(selectedAccType  === "frr"){
+            var upto_month24 = 0, after_month24 = 0;
             var latestIncFRR = Number($('#latestInc-1').val().trim()) || 0;
             var feb20IncFRR = Number($('#feb20Inc-1').val().trim()) || 0;
 
@@ -976,6 +993,10 @@ $(document).ready(function () {
                 if(LTVObj.case1 <= maxOfSchmSnctdLTV)
                     LTV[0] = LTVObj.case1;
                 stressObj.stressType = "Mild Stress";
+                console.log("CASE 2 OF SALARIED of getFOIROfIndividualBrwr");
+                //FOIR
+                upto_month24 = {upto24Months: latestIncFRR};
+                after_month24 = {after24Months: feb20IncFRR};
             }else if(stressPercentageFRR > 40 && stressPercentageFRR < 100){
                 stressObj.case = "case-6";
                 stressObj.resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
@@ -984,12 +1005,19 @@ $(document).ready(function () {
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
                     LTV[1] = LTVObj.case3;   
                 stressObj.stressType = "Severe Stress";
+                //FOIR
+                upto_month24 = {upto24Months: latestIncFRR};
+                after_month24 = {after24Months: feb20IncFRR};
+
             }else if(stressPercentageFRR == 100){
                 stressObj.case = "case-11";
                 stressObj.resolutionFramework = ["M2","M2R1","M2R2"];
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
                     LTV[1] = LTVObj.case3; 
                 stressType = "Severe Stress";
+                upto_month24 = {upto24Months: (feb20IncFRR * .75)};
+                after_month24 = {after24Months: feb20IncFRR};
+
             }else{
                 stressObj.case = "nocase";
                 stressObj.stressType.resolutionFramework = ["NA"];
