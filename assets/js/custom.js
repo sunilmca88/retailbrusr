@@ -417,13 +417,17 @@ $(document).ready(function () {
         calculateMaxResRepPeriod();
     }
    
-    var combinedRepaymentCapacity = 0,
-        combinedOutsideObligation = 0,
-        maxEMI = 0;
+    var combinedRepaymentCapacity_presentInc = 0,
+        combinedRepaymentCapacity_futureInc = 0,
+        combinedOutsideObligation_presentInc = 0,
+        combinedOutsideObligation_futureInc = 0,
+        maxEMI_presentInc = 0,
+        maxEMI_futureInc = 0;
     // This function is used to assign case type to SALARIED individual borrower of a loan 
     // to faclitate in calculation of FOIR for everybody individually
     function getFOIROfSalIndividual(stressPercentage, latestInc, feb20Inc, maxFOIR, total_deduction){
         FOIRObj = {}
+        
         //var maxFOIR = (Math.min((Number(applicable_foir)+10), FOIRCap /*declared globally and is set to 80 */))/100;
         //console.log("maxFOIR calculated is : "+ maxFOIR);
         console.log("SALARIED stressPercentage : "+stressPercentage +"\n latestInc: "+latestInc+"\n feb20Inc: "+feb20Inc);
@@ -450,15 +454,25 @@ $(document).ready(function () {
             }else{
                 console.log("NO CASE OF SALARIED of getFOIROfSalIndividual");                
             }
-            combinedRepaymentCapacity += FOIRObj["upto24Month"];
-            combinedOutsideObligation += total_deduction;
-            console.log("SALARIED Combined repayment capacity : "+ combinedRepaymentCapacity);
+            combinedRepaymentCapacity_presentInc += FOIRObj["upto24Month"];
+            combinedOutsideObligation_presentInc += total_deduction;
+            console.log("SALARIED Combined repayment capacity present Income: "+ combinedRepaymentCapacity_presentInc);
+            console.log("SALARIED Combined repayment capacity future Income: "+ combinedRepaymentCapacity_futureInc);
             //console.log("TYPE OF FOIRObj['upto24Month'] : "+ typeof FOIRObj["upto24Month"]);
-            FOIRObj["max_monthly_payment"] = FOIRObj["upto24Month"] * maxFOIR;
-            FOIRObj["totalPermissibleDeduction"] = total_deduction;
-            FOIRObj["available_capacity"] = FOIRObj["max_monthly_payment"] - total_deduction;
-            maxEMI += FOIRObj["available_capacity"];
+            FOIRObj["pre_max_monthly_payment"] = FOIRObj["upto24Month"] * maxFOIR;
+            FOIRObj["pre_totalPermissibleDeduction"] = total_deduction;
+            FOIRObj["pre_available_capacity"] = FOIRObj["pre_max_monthly_payment"] - total_deduction;
+            maxEMI_presentInc += FOIRObj["pre_available_capacity"];
             //console.log("FOIRObj inside getFOIROfSalIndividual function : "+ JSON.stringify(FOIRObj));
+            
+            //Calculation of repayment capacity on FUTURE INCOME
+            combinedRepaymentCapacity_futureInc  += FOIRObj["after24Months"];            
+            combinedOutsideObligation_futureInc += total_deduction;
+            console.log("SALARIED Combined repayment capacity future Income : "+ combinedRepaymentCapacity_futureInc);
+            FOIRObj["future_max_monthly_payment"] = FOIRObj["after24Months"] * maxFOIR;
+            FOIRObj["future_available_capacity"] = FOIRObj["future_max_monthly_payment"] - total_deduction;
+            maxEMI_futureInc += FOIRObj["future_available_capacity"];
+            
             return FOIRObj;
     }
 
@@ -484,16 +498,28 @@ $(document).ready(function () {
                 console.log("NO CASE OF OTHER of getFOIROfSalIndividual");                
             }
             
-        }   
-        combinedRepaymentCapacity += FOIRObj["upto24Month"];
-        combinedOutsideObligation += total_deduction;
-        console.log("SALARIED Combined repayment capacity : "+ combinedRepaymentCapacity);
+        }
+
+        //Calculation of repayment capacity on PRESENT INCOME
+        combinedRepaymentCapacity_presentInc += FOIRObj["upto24Month"];
+        combinedOutsideObligation_presentInc += total_deduction;
+        console.log("SALARIED Combined repayment capacity present Income : "+ combinedRepaymentCapacity_presentInc);
         //console.log("TYPE OF FOIRObj['upto24Month'] : "+ typeof FOIRObj["upto24Month"]);
-        FOIRObj["max_monthly_payment"] = FOIRObj["upto24Month"] * maxFOIR;
-        FOIRObj["totalPermissibleDeduction"] = total_deduction;
-        FOIRObj["available_capacity"] = FOIRObj["max_monthly_payment"] - total_deduction;
-        maxEMI += FOIRObj["available_capacity"];
+        FOIRObj["pre_max_monthly_payment"] = FOIRObj["upto24Month"] * maxFOIR;
+        FOIRObj["pre_totalPermissibleDeduction"] = total_deduction;
+        FOIRObj["pre_available_capacity"] = FOIRObj["pre_max_monthly_payment"] - total_deduction;        
+        maxEMI_presentInc += FOIRObj["pre_available_capacity"];
+        
+        //Calculation of repayment capacity on FUTURE INCOME
+        combinedRepaymentCapacity_futureInc  += FOIRObj["after24Months"];        
+        combinedOutsideObligation_futureInc += total_deduction;
+        console.log("SALARIED Combined repayment capacity future Income : "+ combinedRepaymentCapacity_futureInc);
+        FOIRObj["future_max_monthly_payment"] = FOIRObj["after24Months"] * maxFOIR;
+        FOIRObj["future_available_capacity"] = FOIRObj["future_max_monthly_payment"] - total_deduction;
+        maxEMI_futureInc += FOIRObj["future_available_capacity"];
         //console.log("FOIRObj inside getFOIROfOthIndividual function: "+ JSON.stringify(FOIRObj));
+
+
         return FOIRObj;
         
     }
@@ -502,9 +528,12 @@ $(document).ready(function () {
 
     function calculateConsolidatedIncome(accType){
         //applicantsObj = [];
-        combinedRepaymentCapacity= 0;
-        combinedOutsideObligation = 0;
-        maxEMI = 0;
+        combinedRepaymentCapacity_presentInc= 0;
+        combinedRepaymentCapacity_futureInc = 0;
+        combinedOutsideObligation_futureInc = 0;
+        combinedOutsideObligation_presentInc = 0;
+        maxEMI_presentInc = 0;
+        maxEMI_futureInc = 0;
         var consolidatedCaseType = "",
         salStressPercentageConsolidated = 0,
         othStressPercentageConsolidated = 0;
@@ -589,17 +618,24 @@ $(document).ready(function () {
             }
         }
 
-        console.log("COMBINED REPAYMENT CAPACITY : "+ combinedRepaymentCapacity);
+        console.log("COMBINED REPAYMENT CAPACITY : "+ combinedRepaymentCapacity_presentInc);
         stressObj.repaymentOnPresentIncome = {
-            combinedRepaymentCapacity : combinedRepaymentCapacity || 0,
-            combinedOutsideObligation : combinedOutsideObligation || 0,
-            maxEMI : maxEMI || 0,
-            minEMI : (.5 * combinedRepaymentCapacity)-combinedOutsideObligation || 0
+            combinedRepaymentCapacity_presentInc : combinedRepaymentCapacity_presentInc || 0,
+            combinedOutsideObligation_presentInc : combinedOutsideObligation_presentInc || 0,
+            maxEMI_presentInc : maxEMI_presentInc || 0,
+            minEMI_presentInc : (.5 * combinedRepaymentCapacity_presentInc)-combinedOutsideObligation_presentInc || 0
         }
-        // stressObj.combinedRepaymentCapacity = combinedRepaymentCapacity || 0;
-        // stressObj.combinedOutsideObligation = combinedOutsideObligation || 0;
-        // stressObj.maxEMI = maxEMI || 0;
-        // stressObj.minEMI = (.5 * combinedRepaymentCapacity)-combinedOutsideObligation || 0;
+
+        stressObj.repaymentOnFutureIncome = {
+            combinedRepaymentCapacity_futureInc : combinedRepaymentCapacity_futureInc || 0,
+            combinedOutsideObligation_futureInc : combinedOutsideObligation_futureInc || 0,
+            maxEMI_futureInc : maxEMI_futureInc || 0,
+            minEMI_futureInc : (.5 * combinedRepaymentCapacity_futureInc)-combinedOutsideObligation_futureInc || 0
+        }
+        // stressObj.combinedRepaymentCapacity_presentInc = combinedRepaymentCapacity_presentInc || 0;
+        // stressObj.combinedOutsideObligation_presentInc = combinedOutsideObligation_presentInc || 0;
+        // stressObj.maxEMI_presentInc = maxEMI_presentInc || 0;
+        // stressObj.minEMI = (.5 * combinedRepaymentCapacity_presentInc)-combinedOutsideObligation_presentInc || 0;
         salStressPercentageConsolidated = calculateStress(salariedLatestInc, salariedFeb20Inc) || 0;
         othStressPercentageConsolidated = calculateStress(otherLatestInc, otherFeb20Inc) || 0;
         console.log("salStressPercentageConsolidated: "+salStressPercentageConsolidated);
@@ -631,7 +667,7 @@ $(document).ready(function () {
                 if(accType === "od")
                     resolutionFramework = ["F2","F1F2"];
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
+                    LTV[0] = LTVObj.case3;
                 // else
                     //     LTV[1] = 0;
                 stressType = "Severe Stress";
@@ -666,7 +702,7 @@ $(document).ready(function () {
                 if(accType === "od")
                     resolutionFramework = ["F2","F1F2"];
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
+                    LTV[0] = LTVObj.case3;
                 // else
                     //     LTV[1] = 0;  
                 stressType = "Severe Stress";
