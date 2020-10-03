@@ -832,6 +832,7 @@ $(document).ready(function () {
     function monthlyIntCalc(annualInterest){
         annualInterest = annualInterest * .01;
         console.log(Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1);
+        return (Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1);
     }
 
 
@@ -1099,12 +1100,12 @@ $(document).ready(function () {
         return Math.log(num / den) / Math.log(1 + rate);
     }
 
-    function calculateTenureExtension(){
+    function calculateTenureExtension(monthlyInterest){
         console.log("INSIDE CALCULATE TENURE EXTENSION FUNCTION");
         var maxTenureExtn = 24;
         var presentOutstanding = Number(prsntOutstdng.val().trim());
         var minEmi = stressObj.repaymentOnFutureIncome.minEMI_futureInc;
-        var monthlyInterest = Math.pow(parseFloat((1+parseFloat(Number(proposedROI.val())*.01))), parseFloat((1/12)))-1;
+        
        // alert($accType.val());
         if($accType.val() == "loan" && ("HL" == $accSchm.val() || "ELWS" == $accSchm.val()|| "ELWoS" == $accSchm.val())){
             //console.log("stressObj.minEMI_futureInc : "+ stressObj.minEMI_futureInc);
@@ -1135,11 +1136,16 @@ $(document).ready(function () {
 
     function getEMIforR1(){
         console.log("Cat 3: Post 24m EMI STARTED for R1 INSIDE GET EMI FOR R1 FUNCTION");
-        var presentOutstanding = prsntOutstdng.val().trim();
-        
+        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var monthlyInterest = monthlyIntCalc(Number(proposedROI.val().trim()))
         //calculateTenureExtension();
-        var finalTenureExtnProvided = calculateTenureExtension();
+        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest);
         console.log("finalTenureExtnProvided :"+ finalTenureExtnProvided);
+        var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue, -presentOutstanding,0,0);
+        console.log(monthlyInterest +"\n"+ finalTenureExtnProvided +"\n"+blncLoanTenureValue +"\n"+finalTenureExtnProvided+blncLoanTenureValue +"\n"+presentOutstanding +"\n");
+           
+        console.log("post24EMI : "+post24EMI);
+        alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
         
     }
     
