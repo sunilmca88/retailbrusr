@@ -2,10 +2,11 @@
 $(document).ready(function () {
     
     /******Variable Initialisation starts here******/
+    window.stressObj = {};
     var accObj = {},
         LTVObj = {},
         FOIRObj = {},
-        stressObj = {},
+        //stressObj = {},
         resRepPeriod = 0,
         resolutionFramework = [],
         LTV = [],
@@ -35,7 +36,7 @@ $(document).ready(function () {
         unsrvcdInt = $('#unsrvcdInt');
         //estimatedMoratoriumInt = 0;
         //blncPeriodRetirement = $('#blncPeriodRetirement');
-
+   
     var loanOptions = {
         "Select":"",
         "Home Loan": "HL",
@@ -95,7 +96,10 @@ $(document).ready(function () {
     //$('#popupModal').modal();
     /******Default function Initialisation ends here******/
 
-    $accType.change(function () {        
+
+    
+
+    $accType.change(function () {     
         $noOfApplicant.removeAttr('disabled');
         $noOfApplicant.empty();
         selectedAccType = $('option:selected', this).val();
@@ -880,7 +884,7 @@ $(document).ready(function () {
         return 0;
     }
 
-    // This function is from David Goodman's Javascript Bible.
+    // 
     function conv_number(expr, decplaces) {
         var str = "" + Math.round(eval(expr) * Math.pow(10,decplaces));
         while (str.length <= decplaces) {
@@ -918,14 +922,14 @@ $(document).ready(function () {
         pmt = parseFloat(pmt);
         pv = parseFloat(pv);
         if ( nper == 0 ) {
-        alert("Why do you want to test me with zeros?");
-        return(0);
+            alert("Why do you want to test me with zeros?");
+            return(0);
         }
         if ( rate == 0 ) { // Interest rate is 0
-        fv_value = -(pv + (pmt * nper));
+            fv_value = -(pv + (pmt * nper));
         } else {
-        x = Math.pow(1 + rate, nper);
-        fv_value = - ( -pmt + x * pmt + rate * x * pv ) /rate;
+            x = Math.pow(1 + rate, nper);
+            fv_value = - ( -pmt + x * pmt + rate * x * pv ) /rate;
         }
         fv_value = conv_number(fv_value,2);
         return (fv_value);
@@ -1072,7 +1076,72 @@ $(document).ready(function () {
             
             console.log("Account Type None");
         }
+        getEMIforR1();
     });
+
+
+    function calculateNPER(rate, payment, present, future, type) {
+        // Initialize type
+        var type = (typeof type === 'undefined') ? 0 : type;
+      
+        // Initialize future value
+        var future = (typeof future === 'undefined') ? 0 : future;
+      
+        // Evaluate rate and periods (TODO: replace with secure expression evaluator)
+        rate = eval(rate);
+        console.log("INSIDE NPER RATE: "+ rate);
+        // Return number of periods
+        var num = payment * (1 + rate * type) - future * rate;
+        console.log("INSIDE NPER NUM: "+ num);
+        var den = (present * rate + payment * (1 + rate * type));
+        console.log("INSIDE NPER DEN: "+ den);
+        console.log("NPER CALCULATED IS : "+ Math.log(num / den) / Math.log(1 + rate));
+        return Math.log(num / den) / Math.log(1 + rate);
+    }
+
+    function calculateTenureExtension(){
+        console.log("INSIDE CALCULATE TENURE EXTENSION FUNCTION");
+        var maxTenureExtn = 24;
+        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var minEmi = stressObj.repaymentOnFutureIncome.minEMI_futureInc;
+        var monthlyInterest = Math.pow(parseFloat((1+parseFloat(Number(proposedROI.val())*.01))), parseFloat((1/12)))-1;
+       // alert($accType.val());
+        if($accType.val() == "loan" && ("HL" == $accSchm.val() || "ELWS" == $accSchm.val()|| "ELWoS" == $accSchm.val())){
+            //console.log("stressObj.minEMI_futureInc : "+ stressObj.minEMI_futureInc);
+            console.log("stressObj.repaymentOnFutureIncome.minEMI_futureInc : "+ stressObj.repaymentOnFutureIncome.minEMI_futureInc);
+            
+            console.log(monthlyInterest +"\n"+ blncLoanTenureValue +"\n"+maxTenureExtn +"\n"+blncLoanTenureValue+maxTenureExtn +"\n"+presentOutstanding +"\n");
+            
+            console.log("Monthly Interest : " + monthlyInterest);
+            var EMI24M = pmt(monthlyInterest, blncLoanTenureValue+maxTenureExtn, -presentOutstanding,0,0).toFixed(5);
+            console.log("EMI for 24m+ assuming full tenure extension : "+ EMI24M);
+            if(EMI24M >= minEmi){
+                console.log("EMI for 24m+ < min EMI : NO and final tenure extension is : "+ maxTenureExtn);
+                return maxTenureExtn;
+            }else{
+                var NPER = calculateNPER(monthlyInterest, Number(minEmi), -presentOutstanding,0,0);
+                console.log("NPER VALUE IS: "+NPER);
+                console.log("NPER ROUNDED VALUE: "+Math.round(NPER));
+                NPER = Math.round(NPER);
+                console.log("ROUNDUP(NPER($B$8,B92,-B91,0,0),0)-B29+B31 : "+ 
+                            NPER-blncLoanTenureValue+Number($('#fitlRepTenure').val().trim()));
+                var x = NPER-blncLoanTenureValue+Number($('#fitlRepTenure').val().trim());
+                console.log("Final tenure extension to be provided: "+Math.max(x, maxTenureExtn));
+                return Math.max(x, maxTenureExtn);
+            }
+
+        }
+    }
+
+    function getEMIforR1(){
+        console.log("Cat 3: Post 24m EMI STARTED for R1 INSIDE GET EMI FOR R1 FUNCTION");
+        var presentOutstanding = prsntOutstdng.val().trim();
+        
+        //calculateTenureExtension();
+        var finalTenureExtnProvided = calculateTenureExtension();
+        console.log("finalTenureExtnProvided :"+ finalTenureExtnProvided);
+        
+    }
     
     /****************Calculations Ends Here*************** */
 });
