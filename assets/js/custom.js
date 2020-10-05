@@ -1086,6 +1086,8 @@ $(document).ready(function () {
         getEMIforR1();
 
         getEMIforR2();
+
+        getEMIforM1();
     });
 
     //var presentOutstanding = 0;
@@ -1198,6 +1200,28 @@ $(document).ready(function () {
        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
        console.log("post24EMI in R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
        alert("Cat 3: Post 24m EMI for R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
+    }
+
+     // Fucntion for calculation of Reschedule with step-up
+     function getEMIforM1(){
+        console.log("INSIDE GET EMI FOR M1 FUNCTION");
+        var moratoriupPeriod = calculateMoratPeriod();
+        //estIntMoratorium
+        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriupPeriod, estIntMoratorium, -presentOutstanding);
+        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriupPeriod, -postMoratOutstndgAmt,0,0);
+        console.log("postMoratOutstndgAmt : "+ postMoratOutstndgAmt);
+        console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +" & Cat 3: Post 24m EMI in M1 " + post24EMI);
+        alert("Cat 1: Moratorium in M1: "+ estIntMoratorium +" & Cat 3: Post 24m EMI in M1 " + post24EMI);
+        //var stepUpPeriodR2 = Math.min(24, 24-)
+        //var postStepUpOutstndgAmt = fv(monthlyIntCalc, )
+    //    console.log("Calculated Moratorium : "+ calculateMoratPeriod());
+    //    var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
+    //    var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
+    //    var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
+    //    var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
+    //    console.log("post24EMI in R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
+    //    alert("Cat 3: Post 24m EMI for R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
     }
 
     
