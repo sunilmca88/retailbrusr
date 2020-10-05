@@ -1088,13 +1088,23 @@ $(document).ready(function () {
         getEMIforR2();
 
         getEMIforM1();
+
+        getEMIforM2();
+
+        getEMIforM1R1();
+
+        getEMIforM1R2();
+
+        getEMIforM2R1();
+
+        getEMIforM2R2();
     });
 
-    //var presentOutstanding = 0;
+    var presentOutstanding = 0;
     function calculateTenureExtension(monthlyInterest, isR1){
         console.log("INSIDE CALCULATE TENURE EXTENSION FUNCTION");
         var maxTenureExtn = 0;
-        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        presentOutstanding = Number(prsntOutstdng.val().trim());
         var minEmi = 0;
         var EMI24M = 0;
        // alert($accType.val());
@@ -1175,8 +1185,9 @@ $(document).ready(function () {
     
     // Fucntion for calculation of Reschedule uniformly
     function getEMIforR1(){
+        console.log("********************************************");
         console.log("INSIDE GET EMI FOR R1 FUNCTION");
-        var presentOutstanding = Number(prsntOutstdng.val().trim());
+       // var presentOutstanding = Number(prsntOutstdng.val().trim());
         var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
         console.log("finalTenureExtnProvided :"+ finalTenureExtnProvided);
         var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue, -presentOutstanding,0,0);
@@ -1184,12 +1195,14 @@ $(document).ready(function () {
            
         console.log("post24EMI in R1 : "+post24EMI);
         alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
+        console.log("********************************************");
     }
 
     // Fucntion for calculation of Reschedule with step-up
     function getEMIforR2(){
+        console.log("********************************************");
         console.log("INSIDE GET EMI FOR R2 FUNCTION");
-        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        //var presentOutstanding = Number(prsntOutstdng.val().trim());
 
         //var stepUpPeriodR2 = Math.min(24, 24-)
         //var postStepUpOutstndgAmt = fv(monthlyIntCalc, )
@@ -1198,33 +1211,129 @@ $(document).ready(function () {
        var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
        var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
-       console.log("post24EMI in R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
-       alert("Cat 3: Post 24m EMI for R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
+       console.log("post24EMI in R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
+       alert("Cat 3: Post 24m EMI for R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
+       console.log("********************************************");
     }
 
-     // Fucntion for calculation of Reschedule with step-up
-     function getEMIforM1(){
+    // Fucntion for calculation of Moratorium without intt. Holiday
+    function getEMIforM1(){
+        console.log("********************************************");
         console.log("INSIDE GET EMI FOR M1 FUNCTION");
-        var moratoriupPeriod = calculateMoratPeriod();
+        var moratoriumPeriod = calculateMoratPeriod();
         //estIntMoratorium
-        var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriupPeriod, estIntMoratorium, -presentOutstanding);
-        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriupPeriod, -postMoratOutstndgAmt,0,0);
-        console.log("postMoratOutstndgAmt : "+ postMoratOutstndgAmt);
-        console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +" & Cat 3: Post 24m EMI in M1 " + post24EMI);
-        alert("Cat 1: Moratorium in M1: "+ estIntMoratorium +" & Cat 3: Post 24m EMI in M1 " + post24EMI);
-        //var stepUpPeriodR2 = Math.min(24, 24-)
-        //var postStepUpOutstndgAmt = fv(monthlyIntCalc, )
-    //    console.log("Calculated Moratorium : "+ calculateMoratPeriod());
-    //    var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
-    //    var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
-    //    var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
-    //    var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
-    //    console.log("post24EMI in R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
-    //    alert("Cat 3: Post 24m EMI for R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
+       // var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
+        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
+        console.log("postMoratOutstndgAmt in M1 : "+ postMoratOutstndgAmt);
+        console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
+        alert("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
+        console.log("********************************************");
+        
     }
 
-    
+    // Fucntion for calculation of Moratorium with intt. Holiday
+    function getEMIforM2(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR M2 FUNCTION");
+        var moratoriumPeriod = calculateMoratPeriod();
+        //estIntMoratorium
+       // var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, 0, -presentOutstanding);
+        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
+        
+        console.log("postMoratOutstndgAmt in M2 : "+ postMoratOutstndgAmt);
+        console.log("Cat 3: Post 24m EMI in M2 " + post24EMI);
+        alert("Cat 3: Post 24m EMI in M2 " + post24EMI);
+        console.log("********************************************");        
+    }
+
+    // Fucntion for calculation of Moratorium without intt. Holiday with uniform reschedulement
+    function getEMIforM1R1(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR M1R1 FUNCTION");
+        //Interest payment (morat) = estIntMoratorium
+        var moratoriumPeriod = calculateMoratPeriod();
+        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
+        
+        var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod, -presentOutstanding,0,0);
+        console.log("postMoratOutstndgAmt in M1R1 : "+ postMoratOutstndgAmt);
+        console.log("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +" \nCat 3: Post 24m EMI in M1R1 " + post24EMI);
+        alert("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1R1 " + post24EMI);
+        console.log("********************************************");
+    }
+
+
+     // Fucntion for calculation of Moratorium without intt. Holiday and reschedulement with step-up
+     function getEMIforM1R2(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR M1R2 FUNCTION");
+        //Interest payment (morat) = estIntMoratorium
+        var moratoriumPeriod = calculateMoratPeriod();
+        var stepUpPeriod = Math.min(24, 24 - moratoriumPeriod );
+        console.log("stepUpPeriod in M1R2 is : "+ stepUpPeriod);
+        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
+
+        var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
+        var stepUpOutstndgAmt = fv(monthlyInterest,stepUpPeriod, minEmi, -presentOutstanding);
+        console.log("stepUpOutstndgAmt in M1R2 : "+ stepUpOutstndgAmt);
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
+        
+        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod - stepUpPeriod, -stepUpOutstndgAmt,0,0);
+        console.log("postMoratOutstndgAmt in M1R2 : "+ postMoratOutstndgAmt);
+        console.log("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
+        alert("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
+        
+        console.log("********************************************");
+    }
+
+
+    // Fucntion for calculation of Moratorium with intt. Holiday with uniform reschedulement
+    function getEMIforM2R1(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR M2R1 FUNCTION");
+        var moratoriumPeriod = calculateMoratPeriod();
+        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
+        //estIntMoratorium
+       // var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, 0, -presentOutstanding);
+        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue + finalTenureExtnProvided- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
+        
+        console.log("postMoratOutstndgAmt in M2R1 : "+ postMoratOutstndgAmt);
+        console.log("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
+        alert("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
+        console.log("********************************************");
+        
+    }
+
+    // Fucntion for calculation of Moratorium with intt. Holiday and reschedulement with step-up
+    function getEMIforM2R2(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR M2R2 FUNCTION");
+        //Interest payment (morat) = estIntMoratorium
+        var moratoriumPeriod = calculateMoratPeriod();
+        var stepUpPeriod = Math.min(24, 24 - moratoriumPeriod );
+        console.log("stepUpPeriod in M2R2 is : "+ stepUpPeriod);
+        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
+
+        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, 0, -presentOutstanding);
+        console.log("postMoratOutstndgAmt in M2R2 : "+ postMoratOutstndgAmt);
+
+        var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
+        var stepUpOutstndgAmt = fv(monthlyInterest,stepUpPeriod, minEmi, -postMoratOutstndgAmt);
+        console.log("stepUpOutstndgAmt in M1R2 : "+ stepUpOutstndgAmt);
+        
+        
+        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod - stepUpPeriod, -stepUpOutstndgAmt,0,0);
+        
+        console.log("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
+        alert("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
+        
+        console.log("********************************************");
+    }
+
+
    /*() function calculateNPER(rate, payment, present, future, type) {
         // Initialize type
         var type = (typeof type === 'undefined') ? 0 : type;
