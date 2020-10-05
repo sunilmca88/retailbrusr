@@ -71,15 +71,15 @@ $(document).ready(function () {
 
     var sectorOptions = {
         "Select":"",
-        "Entertainment": "ent",
-        "Gems & Jewellery": "gem",
-        "Tourism": "tou",
-        "Hospitality": "hos",
-        "Electronics": "ele",
-        "Logistics": "log",
-        "Metal": "met",
-        "Automotive": "aut",
-        "Other": "oth"
+        "Entertainment": "A_ent",
+        "Gems & Jewellery": "A_gem",
+        "Tourism": "A_tou",
+        "Hospitality": "A_hos",
+        "Electronics": "B_ele",
+        "Logistics": "B_log",
+        "Metal": "B_met",
+        "Automotive": "B_aut",
+        "Other": "C_oth"
     };
 
 
@@ -529,8 +529,9 @@ $(document).ready(function () {
     }
 
 
-
+    window.sectorObj = [];
     function calculateConsolidatedIncome(accType){
+        
         //applicantsObj = [];
         combinedRepaymentCapacity_presentInc= 0;
         combinedRepaymentCapacity_futureInc = 0;
@@ -548,6 +549,7 @@ $(document).ready(function () {
             noOfApplicant = $noOfApplicant.val();
         //var applicantsObj = []
         for(var i=1; i<=noOfApplicant; i++){
+
             //FOIRObj = [];
             var tempLatestInc = Number($('#latestInc-'+i).val().trim()) || 0;
             var tempFeb20Inc = Number($('#feb20Inc-'+i).val().trim()) || 0;
@@ -582,7 +584,7 @@ $(document).ready(function () {
                     impact: tempBrwrImpact
                     //caseType: applicableCaseOnBrwr,
                 }
-
+                sectorObj[i-1] = "D_na";
                 console.log("Latest Salary : "+ tempLatestInc);
                 salariedLatestInc += parseFloat(tempLatestInc);
                 console.log("i:------> "+salariedLatestInc);
@@ -592,6 +594,7 @@ $(document).ready(function () {
             if(tempBrwrType === "oth"){    
                 maxFOIR = (Math.min((Number(tempFOIRApplicable)+10), FOIRCap /*declared globally and is set to 80 */))/100;
                 console.log("maxFOIR calculated in OTHER SECTION IS is : "+ maxFOIR);
+                var tempSector = $('#sector-'+i).val();
                 var tempNetProfitYr = $('#netProfitYr-'+i).val();
                 var tempNetProfitVal = Number($('#netProfitVal-'+i).val());
                 var tempFOIROth = getFOIROfOthIndividual(
@@ -605,7 +608,7 @@ $(document).ready(function () {
                 applicantsObj[i-1] = {
                     name: tempName,
                     borrowerType: tempBrwrType,
-                    sector : $('#sector-'+i).val(),
+                    sector : tempSector,
                     latestInc: tempLatestInc,
                     feb20Inc: tempFeb20Inc,
                     totalDeduction: tempTotDeduction,
@@ -617,6 +620,7 @@ $(document).ready(function () {
                    // caseType: applicableCaseOnBrwr
                 }
                 
+                sectorObj[i-1] = tempSector;
                 otherLatestInc += parseFloat(tempLatestInc);
                 otherFeb20Inc += parseFloat(tempFeb20Inc);
             }
@@ -790,7 +794,7 @@ $(document).ready(function () {
                 if(accType === "od")
                     resolutionFramework = ["F2","F1F2"];
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
+                    LTV[0] = LTVObj.case3;
                 // else
                     //     LTV[1] = 0;    
                 stressType = "Severe Stress";
@@ -802,7 +806,7 @@ $(document).ready(function () {
                 if(accType === "od")
                     resolutionFramework = ["F2","F1F2"];
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
+                    LTV[0] = LTVObj.case3;
                 // else
                     //     LTV[1] = 0;    
                 stressType = "Severe Stress";
@@ -829,16 +833,17 @@ $(document).ready(function () {
 
     }
     
+    var monthlyInterest = 0;
     function monthlyIntCalc(annualInterest){
         annualInterest = annualInterest * .01;
         console.log(Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1);
-        return (Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1);
+        monthlyInterest =  Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1;
     }
 
 
     $( "#proposedROI" ).blur(function (){
        // alert("test");
-        var proposedROI = $(this).val().trim();
+        var proposedROI = Number($(this).val().trim());
         var presentOutstanding = $('#prsntOutstdng').val().trim();
         if( proposedROI <= 0 || 
             presentOutstanding <= 0 ||
@@ -852,6 +857,7 @@ $(document).ready(function () {
                                       ).toFixed(3)
             // );
         }
+        monthlyIntCalc(proposedROI);
 
     });
 
@@ -929,8 +935,8 @@ $(document).ready(function () {
         if ( rate == 0 ) { // Interest rate is 0
             fv_value = -(pv + (pmt * nper));
         } else {
-            x = Math.pow(1 + rate, nper);
-            fv_value = - ( -pmt + x * pmt + rate * x * pv ) /rate;
+            var x = Math.pow(1 + rate, nper);
+            var fv_value = - ( -pmt + x * pmt + rate * x * pv ) /rate;
         }
         fv_value = conv_number(fv_value,2);
         return (fv_value);
@@ -1078,10 +1084,124 @@ $(document).ready(function () {
             console.log("Account Type None");
         }
         getEMIforR1();
+
+        getEMIforR2();
     });
 
+    //var presentOutstanding = 0;
+    function calculateTenureExtension(monthlyInterest, isR1){
+        console.log("INSIDE CALCULATE TENURE EXTENSION FUNCTION");
+        var maxTenureExtn = 0;
+        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var minEmi = 0;
+        var EMI24M = 0;
+       // alert($accType.val());
+        if($accType.val() == "loan" && ("HL" == $accSchm.val() || "ELWS" == $accSchm.val()|| "ELWoS" == $accSchm.val())){
+            maxTenureExtn = 24;
+           
+        }else{
+            maxTenureExtn = 18;
+        }
 
-    function calculateNPER(rate, payment, present, future, type) {
+        if(isR1){
+            EMI24M = pmt(monthlyInterest, blncLoanTenureValue + maxTenureExtn, -presentOutstanding,0,0).toFixed(5);
+            minEmi = stressObj.repaymentOnFutureIncome.minEMI_futureInc;
+        }else{
+            minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
+            var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
+            console.log("stepUpOutstndgAmt : "+ stepUpOutstndgAmt);
+            EMI24M = pmt(monthlyInterest, blncLoanTenureValue + maxTenureExtn - 24, -stepUpOutstndgAmt,0,0).toFixed(5);
+        }
+        
+        // console.log("EMI for 24m+ assuming full tenure extension : "+ EMI24M);
+         if(EMI24M >= minEmi){
+             console.log("EMI for 24m+ < min EMI : NO and final tenure extension is : "+ maxTenureExtn);
+             return maxTenureExtn;
+         }else{
+             console.log("EMI for 24m+ < min EMI : NO and final tenure extension is : "+ 0);
+             return 0;               
+         }
+    }
+
+    function calculateMoratPeriod(){
+        console.log("Sector Object is : "+ sectorObj);
+        var frequency = {};
+        //sectorObj = sectorObj.sort();
+        jQuery.each(sectorObj, function(key,value) {
+            if (!frequency.hasOwnProperty(value)) {
+                frequency[value] = 1;
+            } else {
+                frequency[value]++;
+            }
+        });
+
+        console.log("Object with max value is : "+ Object.keys(frequency).reduce(function(a, b){ return frequency[a] > frequency[b] ? a : b }));
+
+        var keys = Object.keys(frequency),
+            largest = Math.max.apply(null, keys.map(function (x) {
+                                                        return frequency[x];
+                                                    })),
+            result = keys.reduce(function (result, key) {
+                            if (frequency[key] === largest) {
+                                result.push(key);
+                            }
+
+        return result.sort();
+        }, []);
+        console.log("RESULT : " + result);
+        //var a1=0, a2=0, a3=0, a4=0, b1=0, b2=0, b3=0, b4=0, c1=0, d1=0;
+        for( var i = 0; i<result.length; i++){
+            if(result[i] == "A_ent" ||
+                result[i] == "A_gem"|| 
+                result[i] == "A_tou"||
+                result[i] == "A_hos"){
+                return 12;
+            }else if(result[i] == "B_ele" ||
+                     result[i] == "B_log" ||
+                     result[i] == "B_met" ||
+                     result[i] == "B_aut"){
+                return 9;
+            }else if(result[i] == "C_oth" ||
+                     result[i] == "D_na" ){
+                return 6;
+            } else{
+                alert("Error in calculateMoratPeriod function");
+            }
+        }
+              
+    }
+    
+    // Fucntion for calculation of Reschedule uniformly
+    function getEMIforR1(){
+        console.log("INSIDE GET EMI FOR R1 FUNCTION");
+        var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
+        console.log("finalTenureExtnProvided :"+ finalTenureExtnProvided);
+        var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue, -presentOutstanding,0,0);
+        console.log(monthlyInterest +"\n"+ finalTenureExtnProvided +"\n"+blncLoanTenureValue +"\n"+finalTenureExtnProvided+blncLoanTenureValue +"\n"+presentOutstanding +"\n");
+           
+        console.log("post24EMI in R1 : "+post24EMI);
+        alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
+    }
+
+    // Fucntion for calculation of Reschedule with step-up
+    function getEMIforR2(){
+        console.log("INSIDE GET EMI FOR R2 FUNCTION");
+        var presentOutstanding = Number(prsntOutstdng.val().trim());
+
+        //var stepUpPeriodR2 = Math.min(24, 24-)
+        //var postStepUpOutstndgAmt = fv(monthlyIntCalc, )
+       console.log("Calculated Moratorium : "+ calculateMoratPeriod());
+       var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
+       var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
+       var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
+       var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
+       console.log("post24EMI in R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
+       alert("Cat 3: Post 24m EMI for R2: "+post24EMI +" & Cat 2: Step up EMI in R2 " + minEmi);
+    }
+
+    
+   /*() function calculateNPER(rate, payment, present, future, type) {
         // Initialize type
         var type = (typeof type === 'undefined') ? 0 : type;
       
@@ -1099,55 +1219,8 @@ $(document).ready(function () {
         console.log("NPER CALCULATED IS : "+ Math.log(num / den) / Math.log(1 + rate));
         return Math.log(num / den) / Math.log(1 + rate);
     }
+    */
 
-    function calculateTenureExtension(monthlyInterest){
-        console.log("INSIDE CALCULATE TENURE EXTENSION FUNCTION");
-        var maxTenureExtn = 24;
-        var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var minEmi = stressObj.repaymentOnFutureIncome.minEMI_futureInc;
-        
-       // alert($accType.val());
-        if($accType.val() == "loan" && ("HL" == $accSchm.val() || "ELWS" == $accSchm.val()|| "ELWoS" == $accSchm.val())){
-            //console.log("stressObj.minEMI_futureInc : "+ stressObj.minEMI_futureInc);
-            console.log("stressObj.repaymentOnFutureIncome.minEMI_futureInc : "+ stressObj.repaymentOnFutureIncome.minEMI_futureInc);
-            
-            console.log(monthlyInterest +"\n"+ blncLoanTenureValue +"\n"+maxTenureExtn +"\n"+blncLoanTenureValue+maxTenureExtn +"\n"+presentOutstanding +"\n");
-            
-            console.log("Monthly Interest : " + monthlyInterest);
-            var EMI24M = pmt(monthlyInterest, blncLoanTenureValue+maxTenureExtn, -presentOutstanding,0,0).toFixed(5);
-            console.log("EMI for 24m+ assuming full tenure extension : "+ EMI24M);
-            if(EMI24M >= minEmi){
-                console.log("EMI for 24m+ < min EMI : NO and final tenure extension is : "+ maxTenureExtn);
-                return maxTenureExtn;
-            }else{
-                var NPER = calculateNPER(monthlyInterest, Number(minEmi), -presentOutstanding,0,0);
-                console.log("NPER VALUE IS: "+NPER);
-                console.log("NPER ROUNDED VALUE: "+Math.round(NPER));
-                NPER = Math.round(NPER);
-                console.log("ROUNDUP(NPER($B$8,B92,-B91,0,0),0)-B29+B31 : "+ 
-                            NPER-blncLoanTenureValue+Number($('#fitlRepTenure').val().trim()));
-                var x = NPER-blncLoanTenureValue+Number($('#fitlRepTenure').val().trim());
-                console.log("Final tenure extension to be provided: "+Math.max(x, maxTenureExtn));
-                return Math.max(x, maxTenureExtn);
-            }
 
-        }
-    }
-
-    function getEMIforR1(){
-        console.log("Cat 3: Post 24m EMI STARTED for R1 INSIDE GET EMI FOR R1 FUNCTION");
-        var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var monthlyInterest = monthlyIntCalc(Number(proposedROI.val().trim()))
-        //calculateTenureExtension();
-        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest);
-        console.log("finalTenureExtnProvided :"+ finalTenureExtnProvided);
-        var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue, -presentOutstanding,0,0);
-        console.log(monthlyInterest +"\n"+ finalTenureExtnProvided +"\n"+blncLoanTenureValue +"\n"+finalTenureExtnProvided+blncLoanTenureValue +"\n"+presentOutstanding +"\n");
-           
-        console.log("post24EMI : "+post24EMI);
-        alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
-        
-    }
-    
     /****************Calculations Ends Here*************** */
 });
