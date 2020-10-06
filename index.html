@@ -207,6 +207,131 @@
     </div>
     <!--Applicant Details Start here-->
 
+    <!--Result Screen Starts here-->
+    <div class="row">
+      <table class="table table-hover table-bordered" id="tblResultLoan">
+        <thead>
+          <tr>
+            <th scope="col" class="btn-bob"><b>Result</b></th>
+            <th scope="col">R1</th>
+            <th scope="col">R2</th>
+            <th scope="col">M1</th>
+            <th scope="col">M2</th>
+            <th scope="col">M1+R1</th>
+            <th scope="col">M1+R2</th>
+            <th scope="col">M2+R1</th>
+            <th scope="col">M2+R2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Cat 1: Moratorium</th>
+            <td id="cat1_R1"> - NA - </td>
+            <td id="cat1_R2"> - NA - </td>
+            <td id="cat1_M1"> - NA - </td>
+            <td id="cat1_M2"> - NA - </td>
+            <td id="cat1_M1R1"> - NA - </td>
+            <td id="cat1_M1R2"> - NA - </td>
+            <td id="cat1_M2R1"> - NA - </td>
+            <td id="cat1_M2R2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Cat 2: Step up EMI</th>
+            <td id="cat2_R1"> - NA - </td>
+            <td id="cat2_R2"> - NA - </td>
+            <td id="cat2_M1"> - NA - </td>
+            <td id="cat2_M2"> - NA - </td>
+            <td id="cat2_M1R1"> - NA - </td>
+            <td id="cat2_M1R2"> - NA - </td>
+            <td id="cat2_M2R1"> - NA - </td>
+            <td id="cat2_M2R2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Cat 3: Post 24m EMI</th>
+            <td id="cat3_R1"> - NA - </td>
+            <td id="cat3_R2"> - NA - </td>
+            <td id="cat3_M1"> - NA - </td>
+            <td id="cat3_M2"> - NA - </td>
+            <td id="cat3_M1R1"> - NA - </td>
+            <td id="cat3_M1R2"> - NA - </td>
+            <td id="cat3_M2R1"> - NA - </td>
+            <td id="cat3_M2R2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Whether EMI logic intact?</th>
+            <td id="emiIntact_R1"> - NA - </td>
+            <td id="emiIntact_R2"> - NA - </td>
+            <td id="emiIntact_M1"> - NA - </td>
+            <td id="emiIntact_M2"> - NA - </td>
+            <td id="emiIntact_M1R1"> - NA - </td>
+            <td id="emiIntact_M1R2"> - NA - </td>
+            <td id="emiIntact_M2R1"> - NA - </td>
+            <td id="emiIntact_M2R2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Balance tenure left (post OTR) - in months</th>
+            <td id="blncTenure_R1"> - NA - </td>
+            <td id="blncTenure_R2"> - NA - </td>
+            <td id="blncTenure_M1"> - NA - </td>
+            <td id="blncTenure_M2"> - NA - </td>
+            <td id="blncTenure_M1R1"> - NA - </td>
+            <td id="blncTenure_M1R2"> - NA - </td>
+            <td id="blncTenure_M2R1"> - NA - </td>
+            <td id="blncTenure_M2R2"> - NA - </td>
+          </tr>
+        </tbody>
+      </table>
+
+
+
+
+
+
+      <table class="table table-hover table-bordered" id="tblResultOD">
+        <thead>
+          <tr>
+            <th scope="col" class="btn-bob"><b>Result</b></th>
+            <th scope="col">F1</th>
+            <th scope="col">F2</th>
+            <th scope="col">F1+F2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Cat 1: Moratorium</th>
+            <td id="cat1_F1"> - NA - </td>
+            <td id="cat1_F2"> - NA - </td>
+            <td id="cat1_F1F2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Cat 2: Step up EMI</th>
+            <td id="cat2_F1"> - NA - </td>
+            <td id="cat2_F2"> - NA - </td>
+            <td id="cat2_F1F2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Cat 3: Post 24m EMI</th>
+            <td id="cat3_F1"> - NA - </td>
+            <td id="cat3_F2"> - NA - </td>
+            <td id="cat3_F1F2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Whether EMI logic intact?</th>
+            <td id="emiIntact_F1"> - NA - </td>
+            <td id="emiIntact_F2"> - NA - </td>
+            <td id="emiIntact_F1F2"> - NA - </td>
+          </tr>
+          <tr>
+            <th scope="row">Balance tenure left (post OTR) - in months</th>
+            <td id="blncTenure_F1"> - NA - </td>
+            <td id="blncTenure_F2"> - NA - </td>
+            <td id="blncTenure_F1F2"> - NA - </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!--Result Screen Ends here-->
+
     <button type="button" class="btn btn-info float" id="btnCalculate">Calculate</button>
   </main>
 

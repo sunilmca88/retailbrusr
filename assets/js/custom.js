@@ -93,6 +93,8 @@ $(document).ready(function () {
 
     /******Default function Initialisation starts here******/
     $('[data-toggle="tooltip"]').tooltip(); //Initializing  tooltip
+    $('#tblResultOD').hide();
+    $('#tblResultLoan').hide();
     //$('#popupModal').modal();
     /******Default function Initialisation ends here******/
 
@@ -1076,34 +1078,32 @@ $(document).ready(function () {
             console.log("stressObj : "+ JSON.stringify(stressObj));
         }else if(selectedAccType  === "loan"){
             calculateConsolidatedIncome("loan");
+
+            getEMIforR1();
+            getEMIforR2();
+            getEMIforM1();
+            getEMIforM2();
+            getEMIforM1R1();
+            getEMIforM1R2();
+            getEMIforM2R1();
+            getEMIforM2R2();
+            $('#tblResultOD').hide();
+            $('#tblResultLoan').show();
            
         }else if(selectedAccType  === "od"){
             calculateConsolidatedIncome("od");
+
+            getEMIforF1();
+            getEMIforF2();    
+            getEMIforF1F2();
+            $('#tblResultOD').show();
+            $('#tblResultLoan').hide();
+
         }else{
             
             console.log("Account Type None");
         }
-        getEMIforR1();
-
-        getEMIforR2();
-
-        getEMIforM1();
-
-        getEMIforM2();
-
-        getEMIforM1R1();
-
-        getEMIforM1R2();
-
-        getEMIforM2R1();
-
-        getEMIforM2R2();
-
-        getEMIforF1();
-
-        getEMIforF2();
-
-        getEMIforF1F2();
+        
     });
 
     var presentOutstanding = 0;
@@ -1200,7 +1200,15 @@ $(document).ready(function () {
         console.log(monthlyInterest +"\n"+ finalTenureExtnProvided +"\n"+blncLoanTenureValue +"\n"+finalTenureExtnProvided+blncLoanTenureValue +"\n"+presentOutstanding +"\n");
            
         console.log("post24EMI in R1 : "+post24EMI);
-        alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
+        //alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
+
+        //Setting result table here
+        $('#cat1_R1').html("-");
+        $('#cat2_R1').html("-");
+        $('#cat3_R1').html(Math.round(post24EMI));
+        $('#emiIntact_R1').html("Y");
+        $('#blncTenure_R1').html(finalTenureExtnProvided+blncLoanTenureValue);
+
         console.log("********************************************");
     }
 
@@ -1218,7 +1226,14 @@ $(document).ready(function () {
        var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
        console.log("post24EMI in R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
-       alert("Cat 3: Post 24m EMI for R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
+       console.log("Cat 3: Post 24m EMI for R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
+
+        //Setting result table here
+        $('#cat1_R2').html("-");
+        $('#cat2_R2').html(Math.round(minEmi));
+        $('#cat3_R2').html(Math.round(post24EMI));
+        $('#emiIntact_R2').html(Number($('#prsntEMI').val().trim()) > minEmi ? "Y":"N");
+        $('#blncTenure_R2').html(finalTenureExtnProvided+blncLoanTenureValue);
        console.log("********************************************");
     }
 
@@ -1233,7 +1248,14 @@ $(document).ready(function () {
         var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
         console.log("postMoratOutstndgAmt in M1 : "+ postMoratOutstndgAmt);
         console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
-        alert("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
+        console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
+
+         //Setting result table here
+         $('#cat1_M1').html(Math.round(estIntMoratorium));
+         $('#cat2_M1').html("-");
+         $('#cat3_M1').html(Math.round(post24EMI));
+         $('#emiIntact_M1').html("Y");
+         $('#blncTenure_M1').html(blncLoanTenureValue);
         console.log("********************************************");
         
     }
@@ -1250,7 +1272,14 @@ $(document).ready(function () {
         
         console.log("postMoratOutstndgAmt in M2 : "+ postMoratOutstndgAmt);
         console.log("Cat 3: Post 24m EMI in M2 " + post24EMI);
-        alert("Cat 3: Post 24m EMI in M2 " + post24EMI);
+        console.log("Cat 3: Post 24m EMI in M2 " + post24EMI);
+
+        //Setting result table here
+        $('#cat1_M2').html("-");
+        $('#cat2_M2').html("-");
+        $('#cat3_M2').html(Math.round(post24EMI));
+        $('#emiIntact_M2').html("Y");
+        $('#blncTenure_M2').html(blncLoanTenureValue);
         console.log("********************************************");        
     }
 
@@ -1266,7 +1295,13 @@ $(document).ready(function () {
         var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod, -presentOutstanding,0,0);
         console.log("postMoratOutstndgAmt in M1R1 : "+ postMoratOutstndgAmt);
         console.log("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +" \nCat 3: Post 24m EMI in M1R1 " + post24EMI);
-        alert("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1R1 " + post24EMI);
+        console.log("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1R1 " + post24EMI);
+        //Setting result table here
+        $('#cat1_M1R1').html(Math.round(estIntMoratorium));
+        $('#cat2_M1R1').html("-");
+        $('#cat3_M1R1').html(Math.round(post24EMI));
+        $('#emiIntact_M1R1').html("Y");
+        $('#blncTenure_M1R1').html(finalTenureExtnProvided + blncLoanTenureValue);
         console.log("********************************************");
     }
 
@@ -1289,7 +1324,14 @@ $(document).ready(function () {
         var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod - stepUpPeriod, -stepUpOutstndgAmt,0,0);
         console.log("postMoratOutstndgAmt in M1R2 : "+ postMoratOutstndgAmt);
         console.log("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
-        alert("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
+        console.log("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
+
+        //Setting result table here
+        $('#cat1_M1R2').html(Math.round(estIntMoratorium));
+        $('#cat2_M1R2').html(Math.round(minEmi));
+        $('#cat3_M1R2').html(Math.round(post24EMI));
+        $('#emiIntact_M1R2').html(Number($('#prsntEMI').val().trim()) > minEmi ? "Y":"N");
+        $('#blncTenure_M1R2').html(finalTenureExtnProvided+blncLoanTenureValue);
         
         console.log("********************************************");
     }
@@ -1308,7 +1350,14 @@ $(document).ready(function () {
         
         console.log("postMoratOutstndgAmt in M2R1 : "+ postMoratOutstndgAmt);
         console.log("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
-        alert("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
+        console.log("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
+        
+        //Setting result table here
+        $('#cat1_M2R1').html("-");
+        $('#cat2_M2R1').html("-");
+        $('#cat3_M2R1').html(Math.round(post24EMI));
+        $('#emiIntact_M2R1').html("Y");
+        $('#blncTenure_M2R1').html(finalTenureExtnProvided+blncLoanTenureValue);
         console.log("********************************************");
         
     }
@@ -1334,7 +1383,15 @@ $(document).ready(function () {
         var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod - stepUpPeriod, -stepUpOutstndgAmt,0,0);
         
         console.log("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
-        alert("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
+        console.log("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
+
+
+        //Setting result table here
+        $('#cat1_M2R2').html("-");
+        $('#cat2_M2R2').html(Math.round(minEmi));
+        $('#cat3_M2R2').html(Math.round(post24EMI));
+        $('#emiIntact_M2R2').html(Number($('#prsntEMI').val().trim()) > minEmi ? "Y":"N");
+        $('#blncTenure_M2R2').html(finalTenureExtnProvided+blncLoanTenureValue);
         
         console.log("********************************************");
     }
@@ -1356,10 +1413,20 @@ $(document).ready(function () {
 
         //var postMoratOutstndgAmt = 
 
-        var post24EMI = pmt(monthlyInterest, fitlTenure- moratoriumPeriod, -30000,0,0);
+        var post24EMI = pmt(monthlyInterest, fitlTenure- moratoriumPeriod, -unsrvcdIntVal,0,0);
+        console.log("Max Res Rep period inside F1 is : "+ resRepPeriod);
+        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0)
 
         console.log("postMoratOutstndgAmt in F1 : "+unsrvcdIntVal);
-        alert("Outstanding Amt (Post Morat) is: "+ post24EMI);
+        console.log("Outstanding Amt (Post Morat) in F1 is: "+ post24EMI);
+        console.log("Cat 4: EMI for OD in F1 is: "+ ODEmi);
+
+         //Setting result table here
+         $('#cat1_F1').html("-");
+         $('#cat2_F1').html(Math.round(post24EMI));
+         $('#cat3_F1').html("-");
+         $('#emiIntact_F1').html("Y");
+         $('#blncTenure_F1').html("0");
         console.log("********************************************");
     }
 
@@ -1378,7 +1445,14 @@ $(document).ready(function () {
         var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -accruedIntOnOD, 0, 0);
 
         console.log("accruedIntOnOD in F2 : "+ accruedIntOnOD);
-        alert("Cat 3: Post 24m EMI for F2: "+ post24EMI);
+        console.log("Cat 2: Post 24m EMI for F2: "+ post24EMI);
+
+         //Setting result table here
+         $('#cat1_F2').html("-");
+         $('#cat2_F2').html(Math.round(post24EMI));
+         $('#cat3_F2').html("-");
+         $('#emiIntact_F2').html("Y");
+         $('#blncTenure_F2').html("0");
         console.log("********************************************");
     }
 
@@ -1400,7 +1474,13 @@ $(document).ready(function () {
 
         console.log("accruedIntOnOD in F1F2 : "+ accruedIntOnOD);
         console.log("postMoratOutstndgAmt in F1F2 : "+ postMoratOutstndgAmt);
-        alert("Cat 3: Post 24m EMI for F1F2: "+ post24EMI);
+        console.log("Cat 3: Post 24m EMI for F1F2: "+ post24EMI);
+         //Setting result table here
+         $('#cat1_F1F2').html("-");
+         $('#cat2_F1F2').html(Math.round(post24EMI));
+         $('#cat3_F1F2').html("-");
+         $('#emiIntact_F1F2').html("Y");
+         $('#blncTenure_F1F2').html("0");
         console.log("********************************************");
     }
 
