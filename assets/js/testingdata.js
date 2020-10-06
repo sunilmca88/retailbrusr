@@ -33,7 +33,7 @@ $(document).ready(function () {
 
 
     }
-    startTesting(true); //true for Loan testing and false for OD testing
+    startTesting(false); //true for Loan testing and false for OD testing
 
 
     /**************** SETTING STATIC VALUES FOR TESTING ENDS HERE *******************/
