@@ -1098,6 +1098,12 @@ $(document).ready(function () {
         getEMIforM2R1();
 
         getEMIforM2R2();
+
+        getEMIforF1();
+
+        getEMIforF2();
+
+        getEMIforF1F2();
     });
 
     var presentOutstanding = 0;
@@ -1276,7 +1282,7 @@ $(document).ready(function () {
         var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
 
         var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
-        var stepUpOutstndgAmt = fv(monthlyInterest,stepUpPeriod, minEmi, -presentOutstanding);
+        var stepUpOutstndgAmt = fv(monthlyInterest, stepUpPeriod, minEmi, -presentOutstanding);
         console.log("stepUpOutstndgAmt in M1R2 : "+ stepUpOutstndgAmt);
         var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
         
@@ -1330,6 +1336,71 @@ $(document).ready(function () {
         console.log("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
         alert("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
         
+        console.log("********************************************");
+    }
+
+
+    var unsrvcdIntVal = 0;
+    var sanctndAmtVal = 0;
+    var fitlTenureEntered =  0;
+    //var ODLimit = $('#fitlMorat').val("30000");
+     // Fucntion for calculation of Conversion of interest accrued
+     function getEMIforF1(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR F1 FUNCTION");
+        unsrvcdIntVal = Number(unsrvcdInt.val().trim());
+        sanctndAmtVal = Number(sanctndAmt.val().trim());
+        fitlTenureEntered = Number($('#fitlRepTenure').val().trim());
+        var fitlTenure = Math.max(fitlTenureEntered, 12);
+        var moratoriumPeriod = 0;
+
+        //var postMoratOutstndgAmt = 
+
+        var post24EMI = pmt(monthlyInterest, fitlTenure- moratoriumPeriod, -30000,0,0);
+
+        console.log("postMoratOutstndgAmt in F1 : "+unsrvcdIntVal);
+        alert("Outstanding Amt (Post Morat) is: "+ post24EMI);
+        console.log("********************************************");
+    }
+
+    // Fucntion for calculation of Conversion of interest to be accrued
+     function getEMIforF2(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR F2 FUNCTION");
+        //unsrvcdIntVal = Number(unsrvcdInt.val().trim());
+        sanctndAmtVal = Number(sanctndAmt.val().trim());
+        fitlTenureEntered = Number($('#fitlRepTenure').val().trim());
+        var fitlTenure = Math.min(fitlTenureEntered, 6);
+        var moratoriumPeriod = 0;
+
+        var accruedIntOnOD = fv(monthlyInterest, fitlTenure, 0, -sanctndAmtVal) - sanctndAmtVal;
+
+        var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -accruedIntOnOD, 0, 0);
+
+        console.log("accruedIntOnOD in F2 : "+ accruedIntOnOD);
+        alert("Cat 3: Post 24m EMI for F2: "+ post24EMI);
+        console.log("********************************************");
+    }
+
+     // Conversion of interest accrued and to be accrued
+     function getEMIforF1F2(){
+        console.log("********************************************");
+        console.log("INSIDE GET EMI FOR F1F2 FUNCTION");
+        unsrvcdIntVal = Number(unsrvcdInt.val().trim());
+        sanctndAmtVal = Number(sanctndAmt.val().trim());
+        fitlTenureEntered = Number($('#fitlRepTenure').val().trim());
+        var fitlTenure = Math.min(fitlTenureEntered, 6);
+        var moratoriumPeriod = 0;
+
+        var accruedIntOnOD = Number(fv(monthlyInterest, fitlTenure, 0, -sanctndAmtVal) - sanctndAmtVal);
+
+        var postMoratOutstndgAmt = Number(fv(monthlyInterest, fitlTenure, 0, -unsrvcdIntVal));
+        console.log("accruedIntOnOD + postMoratOutstndgAmt : "+ accruedIntOnOD + postMoratOutstndgAmt);
+        var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -(accruedIntOnOD + postMoratOutstndgAmt), 0, 0);
+
+        console.log("accruedIntOnOD in F1F2 : "+ accruedIntOnOD);
+        console.log("postMoratOutstndgAmt in F1F2 : "+ postMoratOutstndgAmt);
+        alert("Cat 3: Post 24m EMI for F1F2: "+ post24EMI);
         console.log("********************************************");
     }
 
