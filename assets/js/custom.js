@@ -1415,7 +1415,7 @@ $(document).ready(function () {
 
         var post24EMI = pmt(monthlyInterest, fitlTenure- moratoriumPeriod, -unsrvcdIntVal,0,0);
         console.log("Max Res Rep period inside F1 is : "+ resRepPeriod);
-        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0)
+        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0);
 
         console.log("postMoratOutstndgAmt in F1 : "+unsrvcdIntVal);
         console.log("Outstanding Amt (Post Morat) in F1 is: "+ post24EMI);
@@ -1424,7 +1424,7 @@ $(document).ready(function () {
          //Setting result table here
          $('#cat1_F1').html("-");
          $('#cat2_F1').html(Math.round(post24EMI));
-         $('#cat3_F1').html("-");
+         $('#cat3_F1').html(Math.round(ODEmi));
          $('#emiIntact_F1').html("Y");
          $('#blncTenure_F1').html("0");
         console.log("********************************************");
@@ -1443,14 +1443,14 @@ $(document).ready(function () {
         var accruedIntOnOD = fv(monthlyInterest, fitlTenure, 0, -sanctndAmtVal) - sanctndAmtVal;
 
         var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -accruedIntOnOD, 0, 0);
-
+        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0);
         console.log("accruedIntOnOD in F2 : "+ accruedIntOnOD);
         console.log("Cat 2: Post 24m EMI for F2: "+ post24EMI);
 
          //Setting result table here
          $('#cat1_F2').html("-");
          $('#cat2_F2').html(Math.round(post24EMI));
-         $('#cat3_F2').html("-");
+         $('#cat3_F2').html(Math.round(ODEmi));
          $('#emiIntact_F2').html("Y");
          $('#blncTenure_F2').html("0");
         console.log("********************************************");
@@ -1471,14 +1471,14 @@ $(document).ready(function () {
         var postMoratOutstndgAmt = Number(fv(monthlyInterest, fitlTenure, 0, -unsrvcdIntVal));
         console.log("accruedIntOnOD + postMoratOutstndgAmt : "+ accruedIntOnOD + postMoratOutstndgAmt);
         var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -(accruedIntOnOD + postMoratOutstndgAmt), 0, 0);
-
+        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0);
         console.log("accruedIntOnOD in F1F2 : "+ accruedIntOnOD);
         console.log("postMoratOutstndgAmt in F1F2 : "+ postMoratOutstndgAmt);
         console.log("Cat 3: Post 24m EMI for F1F2: "+ post24EMI);
          //Setting result table here
          $('#cat1_F1F2').html("-");
          $('#cat2_F1F2').html(Math.round(post24EMI));
-         $('#cat3_F1F2').html("-");
+         $('#cat3_F1F2').html(Math.round(ODEmi));
          $('#emiIntact_F1F2').html("Y");
          $('#blncTenure_F1F2').html("0");
         console.log("********************************************");
