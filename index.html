@@ -71,7 +71,7 @@
     </div>
 
 
-    <div class="card bg-light">
+    <div class="card bg-light" id="divAccount">
       <div class="card-header">Account Related Information</div>
       <div class="card-body">
         <!--ROW 1 STARTS HERE-->
@@ -209,187 +209,575 @@
 
     <!--Result Screen Starts here-->
     <div class="row">
-      <table class="table table-hover table-bordered" id="tblResultLoan">
-        <thead>
-          <tr>
-            <th scope="col" class="btn-bob"><b>Result</b></th>
-            <th scope="col">R1</th>
-            <th scope="col">R2</th>
-            <th scope="col">M1</th>
-            <th scope="col">M2</th>
-            <th scope="col">M1+R1</th>
-            <th scope="col">M1+R2</th>
-            <th scope="col">M2+R1</th>
-            <th scope="col">M2+R2</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">Cat 1: Moratorium</th>
-            <td id="cat1_R1"> - NA - </td>
-            <td id="cat1_R2"> - NA - </td>
-            <td id="cat1_M1"> - NA - </td>
-            <td id="cat1_M2"> - NA - </td>
-            <td id="cat1_M1R1"> - NA - </td>
-            <td id="cat1_M1R2"> - NA - </td>
-            <td id="cat1_M2R1"> - NA - </td>
-            <td id="cat1_M2R2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Cat 2: Step up EMI</th>
-            <td id="cat2_R1"> - NA - </td>
-            <td id="cat2_R2"> - NA - </td>
-            <td id="cat2_M1"> - NA - </td>
-            <td id="cat2_M2"> - NA - </td>
-            <td id="cat2_M1R1"> - NA - </td>
-            <td id="cat2_M1R2"> - NA - </td>
-            <td id="cat2_M2R1"> - NA - </td>
-            <td id="cat2_M2R2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Cat 3: Post 24m EMI</th>
-            <td id="cat3_R1"> - NA - </td>
-            <td id="cat3_R2"> - NA - </td>
-            <td id="cat3_M1"> - NA - </td>
-            <td id="cat3_M2"> - NA - </td>
-            <td id="cat3_M1R1"> - NA - </td>
-            <td id="cat3_M1R2"> - NA - </td>
-            <td id="cat3_M2R1"> - NA - </td>
-            <td id="cat3_M2R2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Whether EMI logic intact?</th>
-            <td id="emiIntact_R1"> - NA - </td>
-            <td id="emiIntact_R2"> - NA - </td>
-            <td id="emiIntact_M1"> - NA - </td>
-            <td id="emiIntact_M2"> - NA - </td>
-            <td id="emiIntact_M1R1"> - NA - </td>
-            <td id="emiIntact_M1R2"> - NA - </td>
-            <td id="emiIntact_M2R1"> - NA - </td>
-            <td id="emiIntact_M2R2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Balance tenure left (post OTR) - in months</th>
-            <td id="blncTenure_R1"> - NA - </td>
-            <td id="blncTenure_R2"> - NA - </td>
-            <td id="blncTenure_M1"> - NA - </td>
-            <td id="blncTenure_M2"> - NA - </td>
-            <td id="blncTenure_M1R1"> - NA - </td>
-            <td id="blncTenure_M1R2"> - NA - </td>
-            <td id="blncTenure_M2R1"> - NA - </td>
-            <td id="blncTenure_M2R2"> - NA - </td>
-          </tr>
-          <tr>
-            <th colspan="9" class="text-center">Calculate revised FOIR - first 6 months</th>
-          </tr>
-        </tbody>
-      </table>
+      <div class= "table-responsive" id="tblResultLoan">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th scope="col" class="btn-bob"><b>Result</b></th>
+              <th scope="col">R1</th>
+              <th scope="col">R2</th>
+              <th scope="col">M1</th>
+              <th scope="col">M2</th>
+              <th scope="col">M1+R1</th>
+              <th scope="col">M1+R2</th>
+              <th scope="col">M2+R1</th>
+              <th scope="col">M2+R2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Cat 1: Moratorium</th>
+              <td id="cat1_R1"> - NA - </td>
+              <td id="cat1_R2"> - NA - </td>
+              <td id="cat1_M1"> - NA - </td>
+              <td id="cat1_M2"> - NA - </td>
+              <td id="cat1_M1R1"> - NA - </td>
+              <td id="cat1_M1R2"> - NA - </td>
+              <td id="cat1_M2R1"> - NA - </td>
+              <td id="cat1_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Cat 2: Step up EMI</th>
+              <td id="cat2_R1"> - NA - </td>
+              <td id="cat2_R2"> - NA - </td>
+              <td id="cat2_M1"> - NA - </td>
+              <td id="cat2_M2"> - NA - </td>
+              <td id="cat2_M1R1"> - NA - </td>
+              <td id="cat2_M1R2"> - NA - </td>
+              <td id="cat2_M2R1"> - NA - </td>
+              <td id="cat2_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Cat 3: Post 24m EMI</th>
+              <td id="cat3_R1"> - NA - </td>
+              <td id="cat3_R2"> - NA - </td>
+              <td id="cat3_M1"> - NA - </td>
+              <td id="cat3_M2"> - NA - </td>
+              <td id="cat3_M1R1"> - NA - </td>
+              <td id="cat3_M1R2"> - NA - </td>
+              <td id="cat3_M2R1"> - NA - </td>
+              <td id="cat3_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Whether EMI logic intact?</th>
+              <td id="emiIntact_R1"> - NA - </td>
+              <td id="emiIntact_R2"> - NA - </td>
+              <td id="emiIntact_M1"> - NA - </td>
+              <td id="emiIntact_M2"> - NA - </td>
+              <td id="emiIntact_M1R1"> - NA - </td>
+              <td id="emiIntact_M1R2"> - NA - </td>
+              <td id="emiIntact_M2R1"> - NA - </td>
+              <td id="emiIntact_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Balance tenure left (post OTR) - in months</th>
+              <td id="blncTenure_R1"> - NA - </td>
+              <td id="blncTenure_R2"> - NA - </td>
+              <td id="blncTenure_M1"> - NA - </td>
+              <td id="blncTenure_M2"> - NA - </td>
+              <td id="blncTenure_M1R1"> - NA - </td>
+              <td id="blncTenure_M1R2"> - NA - </td>
+              <td id="blncTenure_M2R1"> - NA - </td>
+              <td id="blncTenure_M2R2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+        <!--LOAN RESULT TABLE ENDS HERE-->
 
+      <!--LOAN FOIR TABLE-1 START HERE-->
+      <div class= "table-responsive" id="tblFOIR6Month">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th colspan="9" class="text-center"><b>Calculate Revised FOIR - First 6 Months</b></th>
+            </tr>
+            <tr>
+              <th scope="col" class="btn-bob"><b>FOIR Filter</b></th>
+              <th scope="col">R1</th>
+              <th scope="col">R2</th>
+              <th scope="col">M1</th>
+              <th scope="col">M2</th>
+              <th scope="col">M1+R1</th>
+              <th scope="col">M1+R2</th>
+              <th scope="col">M2+R1</th>
+              <th scope="col">M2+R2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Revised EMI</th>
+              <td id="foir_rev_emi_R1"> - NA - </td>
+              <td id="foir_rev_emi_R2"> - NA - </td>
+              <td id="foir_rev_emi_M1"> - NA - </td>
+              <td id="foir_rev_emi_M2"> - NA - </td>
+              <td id="foir_rev_emi_M1R1"> - NA - </td>
+              <td id="foir_rev_emi_M1R2"> - NA - </td>
+              <td id="foir_rev_emi_M2R1"> - NA - </td>
+              <td id="foir_rev_emi_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &lt; combined Repayment Capacity?</th>
+              <td id="foir_rep_cap_R1"> - NA - </td>
+              <td id="foir_rep_cap_R2"> - NA - </td>
+              <td id="foir_rep_cap_M1"> - NA - </td>
+              <td id="foir_rep_cap_M2"> - NA - </td>
+              <td id="foir_rep_cap_M1R1"> - NA - </td>
+              <td id="foir_rep_cap_M1R2"> - NA - </td>
+              <td id="foir_rep_cap_M2R1"> - NA - </td>
+              <td id="foir_rep_cap_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &gt; Min FOIR?</th>
+              <td id="foir_min_foir_R1"> - NA - </td>
+              <td id="foir_min_foir_R2"> - NA - </td>
+              <td id="foir_min_foir_M1"> - NA - </td>
+              <td id="foir_min_foir_M2"> - NA - </td>
+              <td id="foir_min_foir_M1R1"> - NA - </td>
+              <td id="foir_min_foir_M1R2"> - NA - </td>
+              <td id="foir_min_foir_M2R1"> - NA - </td>
+              <td id="foir_min_foir_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Revised FOIR</th>
+              <td id="foir_rev_foir_R1"> - NA - </td>
+              <td id="foir_rev_foir_R2"> - NA - </td>
+              <td id="foir_rev_foir_M1"> - NA - </td>
+              <td id="foir_rev_foir_M2"> - NA - </td>
+              <td id="foir_rev_foir_M1R1"> - NA - </td>
+              <td id="foir_rev_foir_M1R2"> - NA - </td>
+              <td id="foir_rev_foir_M2R1"> - NA - </td>
+              <td id="foir_rev_foir_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Does EMI Pass Both Filters?</th>
+              <td id="foir_isPass_R1"> - NA - </td>
+              <td id="foir_isPass_R2"> - NA - </td>
+              <td id="foir_isPass_M1"> - NA - </td>
+              <td id="foir_isPass_M2"> - NA - </td>
+              <td id="foir_isPass_M1R1"> - NA - </td>
+              <td id="foir_isPass_M1R2"> - NA - </td>
+              <td id="foir_isPass_M2R1"> - NA - </td>
+              <td id="foir_isPass_M2R2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--LOAN FOIR TABLE-1 ENDS HERE-->
 
+      <!--LOAN FOIR TABLE-2 START HERE-->
+      <div class= "table-responsive" id="tblFOIR6MonthStepup">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th colspan="9" class="text-center"><b>Calculate Revised FOIR - First 6 Months(Step-up)</b></th>
+            </tr>
+            <tr>
+              <th scope="col" class="btn-bob"><b>FOIR Filter</b></th>
+              <th scope="col">R1</th>
+              <th scope="col">R2</th>
+              <th scope="col">M1</th>
+              <th scope="col">M2</th>
+              <th scope="col">M1+R1</th>
+              <th scope="col">M1+R2</th>
+              <th scope="col">M2+R1</th>
+              <th scope="col">M2+R2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Revised EMI</th>
+              <td id="foir2_rev_emi_R1"> - NA - </td>
+              <td id="foir2_rev_emi_R2"> - NA - </td>
+              <td id="foir2_rev_emi_M1"> - NA - </td>
+              <td id="foir2_rev_emi_M2"> - NA - </td>
+              <td id="foir2_rev_emi_M1R1"> - NA - </td>
+              <td id="foir2_rev_emi_M1R2"> - NA - </td>
+              <td id="foir2_rev_emi_M2R1"> - NA - </td>
+              <td id="foir2_rev_emi_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &lt; combined Repayment Capacity?</th>
+              <td id="foir2_rep_cap_R1"> - NA - </td>
+              <td id="foir2_rep_cap_R2"> - NA - </td>
+              <td id="foir2_rep_cap_M1"> - NA - </td>
+              <td id="foir2_rep_cap_M2"> - NA - </td>
+              <td id="foir2_rep_cap_M1R1"> - NA - </td>
+              <td id="foir2_rep_cap_M1R2"> - NA - </td>
+              <td id="foir2_rep_cap_M2R1"> - NA - </td>
+              <td id="foir2_rep_cap_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &gt; Min FOIR?</th>
+              <td id="foir2_min_foir_R1"> - NA - </td>
+              <td id="foir2_min_foir_R2"> - NA - </td>
+              <td id="foir2_min_foir_M1"> - NA - </td>
+              <td id="foir2_min_foir_M2"> - NA - </td>
+              <td id="foir2_min_foir_M1R1"> - NA - </td>
+              <td id="foir2_min_foir_M1R2"> - NA - </td>
+              <td id="foir2_min_foir_M2R1"> - NA - </td>
+              <td id="foir2_min_foir_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Revised FOIR</th>
+              <td id="foir2_rev_foir_R1"> - NA - </td>
+              <td id="foir2_rev_foir_R2"> - NA - </td>
+              <td id="foir2_rev_foir_M1"> - NA - </td>
+              <td id="foir2_rev_foir_M2"> - NA - </td>
+              <td id="foir2_rev_foir_M1R1"> - NA - </td>
+              <td id="foir2_rev_foir_M1R2"> - NA - </td>
+              <td id="foir2_rev_foir_M2R1"> - NA - </td>
+              <td id="foir2_rev_foir_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Does EMI Pass Both Filters?</th>
+              <td id="foir2_isPass_R1"> - NA - </td>
+              <td id="foir2_isPass_R2"> - NA - </td>
+              <td id="foir2_isPass_M1"> - NA - </td>
+              <td id="foir2_isPass_M2"> - NA - </td>
+              <td id="foir2_isPass_M1R1"> - NA - </td>
+              <td id="foir2_isPass_M1R2"> - NA - </td>
+              <td id="foir2_isPass_M2R1"> - NA - </td>
+              <td id="foir2_isPass_M2R2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--LOAN FOIR TABLE-2 ENDS HERE-->
 
+      
+      <!--LOAN FOIR TABLE-3 START HERE-->
+      <div class= "table-responsive" id="tblFOIR24Month">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th colspan="9" class="text-center"><b>Calculate Revised FOIR - Post 24 Months</b></th>
+            </tr>
+            <tr>
+              <th scope="col" class="btn-bob"><b>FOIR Filter</b></th>
+              <th scope="col">R1</th>
+              <th scope="col">R2</th>
+              <th scope="col">M1</th>
+              <th scope="col">M2</th>
+              <th scope="col">M1+R1</th>
+              <th scope="col">M1+R2</th>
+              <th scope="col">M2+R1</th>
+              <th scope="col">M2+R2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Revised EMI</th>
+              <td id="foir3_rev_emi_R1"> - NA - </td>
+              <td id="foir3_rev_emi_R2"> - NA - </td>
+              <td id="foir3_rev_emi_M1"> - NA - </td>
+              <td id="foir3_rev_emi_M2"> - NA - </td>
+              <td id="foir3_rev_emi_M1R1"> - NA - </td>
+              <td id="foir3_rev_emi_M1R2"> - NA - </td>
+              <td id="foir3_rev_emi_M2R1"> - NA - </td>
+              <td id="foir3_rev_emi_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &lt; combined Repayment Capacity?</th>
+              <td id="foir3_rep_cap_R1"> - NA - </td>
+              <td id="foir3_rep_cap_R2"> - NA - </td>
+              <td id="foir3_rep_cap_M1"> - NA - </td>
+              <td id="foir3_rep_cap_M2"> - NA - </td>
+              <td id="foir3_rep_cap_M1R1"> - NA - </td>
+              <td id="foir3_rep_cap_M1R2"> - NA - </td>
+              <td id="foir3_rep_cap_M2R1"> - NA - </td>
+              <td id="foir3_rep_cap_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &gt; Min FOIR?</th>
+              <td id="foir3_min_foir_R1"> - NA - </td>
+              <td id="foir3_min_foir_R2"> - NA - </td>
+              <td id="foir3_min_foir_M1"> - NA - </td>
+              <td id="foir3_min_foir_M2"> - NA - </td>
+              <td id="foir3_min_foir_M1R1"> - NA - </td>
+              <td id="foir3_min_foir_M1R2"> - NA - </td>
+              <td id="foir3_min_foir_M2R1"> - NA - </td>
+              <td id="foir3_min_foir_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Revised FOIR</th>
+              <td id="foir3_rev_foir_R1"> - NA - </td>
+              <td id="foir3_rev_foir_R2"> - NA - </td>
+              <td id="foir3_rev_foir_M1"> - NA - </td>
+              <td id="foir3_rev_foir_M2"> - NA - </td>
+              <td id="foir3_rev_foir_M1R1"> - NA - </td>
+              <td id="foir3_rev_foir_M1R2"> - NA - </td>
+              <td id="foir3_rev_foir_M2R1"> - NA - </td>
+              <td id="foir3_rev_foir_M2R2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Does EMI Pass Both Filters?</th>
+              <td id="foir3_isPass_R1"> - NA - </td>
+              <td id="foir3_isPass_R2"> - NA - </td>
+              <td id="foir3_isPass_M1"> - NA - </td>
+              <td id="foir3_isPass_M2"> - NA - </td>
+              <td id="foir3_isPass_M1R1"> - NA - </td>
+              <td id="foir3_isPass_M1R2"> - NA - </td>
+              <td id="foir3_isPass_M2R1"> - NA - </td>
+              <td id="foir3_isPass_M2R2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--LOAN FOIR TABLE-3 ENDS HERE-->
+      <div class= "table-responsive" id="tblResultOD">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th scope="col" class="btn-bob"><b>Result</b></th>
+              <th scope="col">F1</th>
+              <th scope="col">F2</th>
+              <th scope="col">F1+F2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Cat 1: Moratorium</th>
+              <td id="cat1_F1"> - NA - </td>
+              <td id="cat1_F2"> - NA - </td>
+              <td id="cat1_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Cat 2: Step up EMI</th>
+              <td id="cat2_F1"> - NA - </td>
+              <td id="cat2_F2"> - NA - </td>
+              <td id="cat2_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Cat 3: Post 24m EMI</th>
+              <td id="cat3_F1"> - NA - </td>
+              <td id="cat3_F2"> - NA - </td>
+              <td id="cat3_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Whether EMI logic intact?</th>
+              <td id="emiIntact_F1"> - NA - </td>
+              <td id="emiIntact_F2"> - NA - </td>
+              <td id="emiIntact_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Balance tenure left (post OTR) - in months</th>
+              <td id="blncTenure_F1"> - NA - </td>
+              <td id="blncTenure_F2"> - NA - </td>
+              <td id="blncTenure_F1F2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--Result Screen Ends here-->
 
+      <!--OD FOIR TABLE-1 START HERE-->
+      <div class= "table-responsive" id="tblFOIR6MonthOD">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th colspan="9" class="text-center"><b>Calculate Revised FOIR - First 6 Months</b></th>
+            </tr>
+            <tr>
+              <th scope="col" class="btn-bob"><b>FOIR Filter</b></th>
+              <th scope="col">F1</th>
+              <th scope="col">F2</th>
+              <th scope="col">F1F2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Revised EMI</th>
+              <td id="foir_rev_emi_F1"> - NA - </td>
+              <td id="foir_rev_emi_F2"> - NA - </td>
+              <td id="foir_rev_emi_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &lt; combined Repayment Capacity?</th>
+              <td id="foir_rep_cap_F1"> - NA - </td>
+              <td id="foir_rep_cap_F2"> - NA - </td>
+              <td id="foir_rep_cap_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &gt; Min FOIR?</th>
+              <td id="foir_min_foir_F1"> - NA - </td>
+              <td id="foir_min_foir_F2"> - NA - </td>
+              <td id="foir_min_foir_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Revised FOIR</th>
+              <td id="foir_rev_foir_F1"> - NA - </td>
+              <td id="foir_rev_foir_F2"> - NA - </td>
+              <td id="foir_rev_foir_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Does EMI Pass Both Filters?</th>
+              <td id="foir_isPass_F1"> - NA - </td>
+              <td id="foir_isPass_F2"> - NA - </td>
+              <td id="foir_isPass_F1F2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--OD FOIR TABLE-1 ENDS HERE-->
 
+      <!--OD FOIR TABLE-2 START HERE-->
+      <div class= "table-responsive" id="tblFOIR6MonthStepupOD">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th colspan="9" class="text-center"><b>Calculate Revised FOIR - First 6 Months</b></th>
+            </tr>
+            <tr>
+              <th scope="col" class="btn-bob"><b>FOIR Filter</b></th>
+              <th scope="col">F1</th>
+              <th scope="col">F2</th>
+              <th scope="col">F1F2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Revised EMI</th>
+              <td id="foir2_rev_emi_F1"> - NA - </td>
+              <td id="foir2_rev_emi_F2"> - NA - </td>
+              <td id="foir2_rev_emi_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &lt; combined Repayment Capacity?</th>
+              <td id="foir2_rep_cap_F1"> - NA - </td>
+              <td id="foir2_rep_cap_F2"> - NA - </td>
+              <td id="foir2_rep_cap_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &gt; Min FOIR?</th>
+              <td id="foir2_min_foir_F1"> - NA - </td>
+              <td id="foir2_min_foir_F2"> - NA - </td>
+              <td id="foir2_min_foir_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Revised FOIR</th>
+              <td id="foir2_rev_foir_F1"> - NA - </td>
+              <td id="foir2_rev_foir_F2"> - NA - </td>
+              <td id="foir2_rev_foir_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Does EMI Pass Both Filters?</th>
+              <td id="foir2_isPass_F1"> - NA - </td>
+              <td id="foir2_isPass_F2"> - NA - </td>
+              <td id="foir2_isPass_F1F2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--OD FOIR TABLE-2 ENDS HERE-->
 
-      <table class="table table-hover table-bordered" id="tblResultOD">
-        <thead>
-          <tr>
-            <th scope="col" class="btn-bob"><b>Result</b></th>
-            <th scope="col">F1</th>
-            <th scope="col">F2</th>
-            <th scope="col">F1+F2</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">Cat 1: Moratorium</th>
-            <td id="cat1_F1"> - NA - </td>
-            <td id="cat1_F2"> - NA - </td>
-            <td id="cat1_F1F2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Cat 2: Step up EMI</th>
-            <td id="cat2_F1"> - NA - </td>
-            <td id="cat2_F2"> - NA - </td>
-            <td id="cat2_F1F2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Cat 3: Post 24m EMI</th>
-            <td id="cat3_F1"> - NA - </td>
-            <td id="cat3_F2"> - NA - </td>
-            <td id="cat3_F1F2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Whether EMI logic intact?</th>
-            <td id="emiIntact_F1"> - NA - </td>
-            <td id="emiIntact_F2"> - NA - </td>
-            <td id="emiIntact_F1F2"> - NA - </td>
-          </tr>
-          <tr>
-            <th scope="row">Balance tenure left (post OTR) - in months</th>
-            <td id="blncTenure_F1"> - NA - </td>
-            <td id="blncTenure_F2"> - NA - </td>
-            <td id="blncTenure_F1F2"> - NA - </td>
-          </tr>
-        </tbody>
-      </table>
+       <!--OD FOIR TABLE-3 START HERE-->
+       <div class= "table-responsive" id="tblFOIR24MonthOD">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th colspan="9" class="text-center"><b>Calculate Revised FOIR - First 6 Months</b></th>
+            </tr>
+            <tr>
+              <th scope="col" class="btn-bob"><b>FOIR Filter</b></th>
+              <th scope="col">F1</th>
+              <th scope="col">F2</th>
+              <th scope="col">F1F2</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Revised EMI</th>
+              <td id="foir3_rev_emi_F1"> - NA - </td>
+              <td id="foir3_rev_emi_F2"> - NA - </td>
+              <td id="foir3_rev_emi_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &lt; combined Repayment Capacity?</th>
+              <td id="foir3_rep_cap_F1"> - NA - </td>
+              <td id="foir3_rep_cap_F2"> - NA - </td>
+              <td id="foir3_rep_cap_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">EMI &gt; Min FOIR?</th>
+              <td id="foir3_min_foir_F1"> - NA - </td>
+              <td id="foir3_min_foir_F2"> - NA - </td>
+              <td id="foir3_min_foir_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Revised FOIR</th>
+              <td id="foir3_rev_foir_F1"> - NA - </td>
+              <td id="foir3_rev_foir_F2"> - NA - </td>
+              <td id="foir3_rev_foir_F1F2"> - NA - </td>
+            </tr>
+            <tr>
+              <th scope="row">Does EMI Pass Both Filters?</th>
+              <td id="foir3_isPass_F1"> - NA - </td>
+              <td id="foir3_isPass_F2"> - NA - </td>
+              <td id="foir3_isPass_F1F2"> - NA - </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!--OD FOIR TABLE-3 ENDS HERE-->
+      
+      <div class= "table-responsive" id="annexure">
+        <table class="table table-hover table-bordered">
+          <thead>
+            <tr>
+              <th scope="col"><b>Symbol</b></th>
+              <th scope="col">Full form</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>R1</th>
+              <td>Reschedule uniformly</td>
+            </tr>
+            <tr>
+              <th>R2</th>
+              <td>Reschedule with step-up</td>
+            </tr>
+            <tr>
+              <th>M1</th>
+              <td>Moratorium without intt. Holiday</td>
+            </tr>
+            <tr>
+              <th>M2</th>
+              <td>Moratorium with intt. Holiday</td>
+            </tr>
+            <tr>
+              <th>M1R1</th>
+              <td>Moratorium without intt. Holiday with uniform reschedulement</td>
+            </tr>
+            <tr>
+              <th>M1R2</th>
+              <td>Moratorium without intt. Holiday and reschedulement with step-up</td>
+            </tr>
+            <tr>
+              <th>M2R1</th>
+              <td>Moratorium with intt. Holiday with uniform reschedulement</td>
+            </tr>
+            <tr>
+              <th>M2R2</th>
+              <td>Moratorium with intt. Holiday and reschedulement with step-up</td>
+            </tr>
+            <tr>
+              <th>F1</th>
+              <td>Conversion of interest accrued</td>
+            </tr>
+            <tr>
+              <th>F2</th>
+              <td>Conversion of interest to be accrued</td>
+            </tr>
+            <tr>
+              <th>F1F2</th>
+              <td>Conversion of interest accrued and to be accrued</td>
+            </tr>
+          </tbody>  
+        </table>
+      </div>
     </div>
-    <!--Result Screen Ends here-->
-
-    <table class="table table-hover table-bordered" id="annexure">
-      <thead>
-        <tr>
-          <th scope="col"><b>Symbol</b></th>
-          <th scope="col">Full form</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th>R1</th>
-          <td>Reschedule uniformly</td>
-        </tr>
-        <tr>
-          <th>R2</th>
-          <td>Reschedule with step-up</td>
-        </tr>
-        <tr>
-          <th>M1</th>
-          <td>Moratorium without intt. Holiday</td>
-        </tr>
-        <tr>
-          <th>M2</th>
-          <td>Moratorium with intt. Holiday</td>
-        </tr>
-        <tr>
-          <th>M1R1</th>
-          <td>Moratorium without intt. Holiday with uniform reschedulement</td>
-        </tr>
-        <tr>
-          <th>M1R2</th>
-          <td>Moratorium without intt. Holiday and reschedulement with step-up</td>
-        </tr>
-        <tr>
-          <th>M2R1</th>
-          <td>Moratorium with intt. Holiday with uniform reschedulement</td>
-        </tr>
-        <tr>
-          <th>M2R2</th>
-          <td>Moratorium with intt. Holiday and reschedulement with step-up</td>
-        </tr>
-        <tr>
-          <th>F1</th>
-          <td>Conversion of interest accrued</td>
-        </tr>
-        <tr>
-          <th>F2</th>
-          <td>Conversion of interest to be accrued</td>
-        </tr>
-        <tr>
-          <th>F1F2</th>
-          <td>Conversion of interest accrued and to be accrued</td>
-        </tr>
-      </tbody>  
-    </table>
-
     <button type="button" class="btn btn-info float" id="btnCalculate">Calculate</button>
   </main>
 

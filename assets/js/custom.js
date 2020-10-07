@@ -3,12 +3,12 @@ $(document).ready(function () {
     
     /******Variable Initialisation starts here******/
     window.stressObj = {};
+    window.emiObj = {};
     var accObj = {},
         LTVObj = {},
         FOIRObj = {},
-        //stressObj = {},
         resRepPeriod = 0,
-        resolutionFramework = [],
+       // resolutionFramework = [],
         LTV = [],
         applicantsObj = [];
 
@@ -18,10 +18,9 @@ $(document).ready(function () {
     var stressType = "",
         additionalFOIR = 10,
         FOIRCap = 80,
-        minFOIR = 50,
-        estIntMoratorium = 0,
-        blncLoanTenureValue =  0,
-        accSchmSelectedVal = "";  
+        minFOIR = 50;
+        //estIntMoratorium = 0,
+        //accSchmSelectedVal = "";  
 
    // var maxOfBlncTenureRetirementAge = 0;
     
@@ -30,9 +29,9 @@ $(document).ready(function () {
     var sanctndAmt =  $('#sanctndAmt'),
         sanctLTV = $('#sanctLTV'),
         schmLTV = $('#schmLTV'),
-        prsntOutstdng = $('#prsntOutstdng'),
+        //prsntOutstdng = $('#prsntOutstdng'),
         valOfSecurity = $('#valOfSecurity'),
-        proposedROI = $('#proposedROI'),
+        //proposedROI = $('#proposedROI'),
         unsrvcdInt = $('#unsrvcdInt');
         //estimatedMoratoriumInt = 0;
         //blncPeriodRetirement = $('#blncPeriodRetirement');
@@ -93,8 +92,16 @@ $(document).ready(function () {
 
     /******Default function Initialisation starts here******/
     $('[data-toggle="tooltip"]').tooltip(); //Initializing  tooltip
+    $('#annexure').hide();
+    $('#tblFOIR24MonthOD').hide();
+    $('#tblFOIR6MonthStepupOD').hide();
+    $('#tblFOIR6MonthOD').hide();
     $('#tblResultOD').hide();
+    $('#tblFOIR24Month').hide();
+    $('#tblFOIR6MonthStepup').hide();
+    $('#tblFOIR6Month').hide();
     $('#tblResultLoan').hide();
+  //  $('#tblResultLoan').hide();
     //$('#popupModal').modal();
     /******Default function Initialisation ends here******/
 
@@ -365,12 +372,32 @@ $(document).ready(function () {
     
     function createAccObject(){
         accObj = {};
+        /* Monthly Interest Calculation starts here */
+        var proposedROI = Number($('#proposedROI').val().trim());
+        accObj.prsntOutstdng = Number($('#prsntOutstdng').val().trim()); 
+        if( proposedROI <= 0 || 
+            accObj.prsntOutstdng <= 0 ||
+            !$.isNumeric(proposedROI) ||
+            !$.isNumeric(accObj.prsntOutstdng)){
+                alert("Error in Estimated interest during moratorium calculation. Please enter proper values for Present Outstanding and Proposed ROI");
+        }else{
+            // $('#estIntMoratorium').val(
+                accObj.estIntMoratorium =  parseFloat(accObj.prsntOutstdng * 
+                                        (Math.pow(parseFloat((1 + parseFloat(proposedROI * .01))), parseFloat((1/12)))-1)
+                                      ).toFixed(3)
+            // );
+        }
+       // monthlyIntCalc(proposedROI);
+       proposedROI = proposedROI * .01;
+       console.log(Math.pow(parseFloat((1+parseFloat(proposedROI))), parseFloat((1/12)))-1);
+       accObj.monthlyInterest =  Number(Math.pow(parseFloat((1+parseFloat(proposedROI))), parseFloat((1/12)))-1);
+
+
         console.log("Inside Create Acc Object Function : "+$accType.val());
         //var accType = $accType.val(),            
         var accNo = $('#accNo').val().trim(),
-        accSchmSelectedVal = $accSchm.val();
-        //console.log("SKYYYYYYYYY  accSchmSelectedVal = $accSchm.val(); :"+  accSchmSelectedVal);
-        if(accType == null || accType == ""){
+            accSchmSelectedVal = $accSchm.val();
+       if(accType == null || accType == ""){
             alert("Error! Please select account type");
         }else{
             accObj.accType =  selectedAccType;
@@ -389,11 +416,11 @@ $(document).ready(function () {
         }
         
         accObj.sanctndAmt = sanctndAmt.val().trim();
-        accObj.prsntOutstdng = prsntOutstdng.val().trim();
+        
         accObj.valOfSecurity = valOfSecurity.val().trim();
-        accObj.proposedROI = proposedROI.val().trim();
-        accObj.estIntMoratorium = estIntMoratorium;
-        accObj.blncLoanTenure = blncLoanTenureValue;
+        accObj.proposedROI = proposedROI;
+        
+        accObj.blncLoanTenure = Number($('#blncLoanTenure').val().trim());
         accObj.sanctLTV = sanctLTV.val().trim();        
         accObj.schmLTV = schmLTV.val().trim();
         accObj.fitlRepTenure = $('#fitlRepTenure').val().trim();
@@ -412,11 +439,11 @@ $(document).ready(function () {
     function calculateLTV(){
        
         LTVObj = {};
-        LTVObj.case1 = parseFloat((Number(prsntOutstdng.val().trim())*100/Number(valOfSecurity.val().trim())).toFixed(5));
-        LTVObj.case2 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim()).toFixed(5));
-        LTVObj.case3 = parseFloat(((Number(prsntOutstdng.val().trim()) + Number(estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5));
-        LTVObj.case4 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5));
-        LTVObj.case5 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(estIntMoratorium) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim()).toFixed(5));
+        LTVObj.case1 = parseFloat((accObj.prsntOutstdng)*100/Number(valOfSecurity.val().trim())).toFixed(5);
+        LTVObj.case2 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim())).toFixed(5);
+        LTVObj.case3 = parseFloat(((accObj.prsntOutstdng) + Number(accObj.estIntMoratorium))*100/Number(valOfSecurity.val().trim())).toFixed(5);
+        LTVObj.case4 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(accObj.estIntMoratorium))*100/Number(valOfSecurity.val().trim()))).toFixed(5);
+        LTVObj.case5 = parseFloat(((Number(sanctndAmt.val().trim()) + Number(accObj.estIntMoratorium) + Number(unsrvcdInt.val().trim()))*100/valOfSecurity.val().trim())).toFixed(5);
         console.log("LTV Object : "+ JSON.stringify(LTVObj));
 
 
@@ -542,8 +569,9 @@ $(document).ready(function () {
         maxEMI_presentInc = 0;
         maxEMI_futureInc = 0;
         var consolidatedCaseType = "",
-        salStressPercentageConsolidated = 0,
-        othStressPercentageConsolidated = 0;
+            resolutionFramework = [],
+            salStressPercentageConsolidated = 0,
+            othStressPercentageConsolidated = 0;
         var salariedLatestInc = 0,
             salariedFeb20Inc = 0,
             otherLatestInc = 0,
@@ -659,27 +687,37 @@ $(document).ready(function () {
             }
             if(othStressPercentageConsolidated>= 50 && othStressPercentageConsolidated <100){
                 consolidatedCaseType = "case-8";
-                if(accType === "loan")
+                if(accType === "loan"){
                     resolutionFramework = ["R1","R2"];
-                if(accType === "od")
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                }                    
+                if(accType === "od"){
                     resolutionFramework = ["F1"];
-                if(LTVObj.case1 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case1;
-                // else
-                //     LTV[0] = 0;
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                }                
                 stressType = "Mild Stress";
                 
             }
             if(othStressPercentageConsolidated === 100){
                 consolidatedCaseType = "case-9";
-                if(accType === "loan")
-                    resolutionFramework = ["M2","M2R1","M2R2"];
-                if(accType === "od")
-                    resolutionFramework = ["F2","F1F2"];
-                if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0;
+                if(accType === "loan"){
+                    resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case3;
+                }                    
+                if(accType === "od"){
+                    resolutionFramework = ["F1","F2","F1F2"];
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                    if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case4;
+                    if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                        LTV[2] = LTVObj.case5;
+                }
                 stressType = "Severe Stress";
             }
 
@@ -695,26 +733,36 @@ $(document).ready(function () {
             }
             if(othStressPercentageConsolidated>= 50 && othStressPercentageConsolidated <100){
                 consolidatedCaseType = "case-8";
-                if(accType === "loan")
+                if(accType === "loan"){
                     resolutionFramework = ["R1","R2"];
-                if(accType === "od")
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                }                    
+                if(accType === "od"){
                     resolutionFramework = ["F1"];
-                if(LTVObj.case1 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case1;
-                // else
-                //     LTV[0] = 0;
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                }                
                 stressType = "Mild Stress";
             }
             if(othStressPercentageConsolidated === 100){
                 consolidatedCaseType = "case-9";
-                if(accType === "loan")
-                    resolutionFramework = ["M2","M2R1","M2R2"];
-                if(accType === "od")
-                    resolutionFramework = ["F2","F1F2"];
-                if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0;  
+                if(accType === "loan"){
+                    resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case3;
+                }                    
+                if(accType === "od"){
+                    resolutionFramework = ["F1","F2","F1F2"];
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                    if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case4;
+                    if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                        LTV[2] = LTVObj.case5;
+                }
                 stressType = "Severe Stress";
             }
          
@@ -722,38 +770,50 @@ $(document).ready(function () {
 
             if(othStressPercentageConsolidated < 50 || othStressPercentageConsolidated === 0){
                 consolidatedCaseType = "case-2";
-                if(accType === "loan")
+                if(accType === "loan"){
                     resolutionFramework = ["R1","R2"];
-                if(accType === "od")
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                }                    
+                if(accType === "od"){
                     resolutionFramework = ["F1"];
-                if(LTVObj.case1 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case1;
-                // else
-                //     LTV[0] = 0;
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                }                
                 stressType = "Mild Stress";
             }
             if(othStressPercentageConsolidated>= 50 && othStressPercentageConsolidated <100){
                 consolidatedCaseType = "case-2_8";
-                if(accType === "loan")
+                if(accType === "loan"){
                     resolutionFramework = ["R1","R2"];
-                if(accType === "od")
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                }
+                if(accType === "od"){
                     resolutionFramework = ["F1"];
-                if(LTVObj.case1 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case1;
-                // else
-                //     LTV[0] = 0;
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                }
                 stressType = "Mild Stress";
             }
             if(othStressPercentageConsolidated === 100){
                 consolidatedCaseType = "case-9";
-                if(accType === "loan")
-                    resolutionFramework = ["M2","M2R1","M2R2"];
-                if(accType === "od")
-                    resolutionFramework = ["F2","F1F2"];
-                if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0; 
+                if(accType === "loan"){
+                    resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case3;
+                }                    
+                if(accType === "od"){
+                    resolutionFramework = ["F1","F2","F1F2"];
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                    if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case4;
+                    if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                        LTV[2] = LTVObj.case5;
+                }
                 stressType = "Severe Stress";
             }
         }else if(salStressPercentageConsolidated > 40 && salStressPercentageConsolidated < 100){
@@ -762,55 +822,83 @@ $(document).ready(function () {
                 othStressPercentageConsolidated === 0 ||
                 (othStressPercentageConsolidated>= 50 && othStressPercentageConsolidated <100)){
                     consolidatedCaseType = "case-3";
-                    if(accType === "loan")
+                    if(accType === "loan"){
                         resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
-                    if(accType === "od")
-                        resolutionFramework = ["F1","F2","F1F2"];  
-                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
-                        LTV[0] = LTVObj.case1;
-                    // else
-                    //     LTV[0] = 0;
-                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                        LTV[1] = LTVObj.case3;
-                    // else
-                    //     LTV[1] = 0;           
+                        if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                            LTV[0] = LTVObj.case1;
+                        if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                            LTV[1] = LTVObj.case3;
+                    }                    
+                    if(accType === "od"){
+                        resolutionFramework = ["F1","F2","F1F2"];
+                        if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                            LTV[0] = LTVObj.case2;
+                        if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                            LTV[1] = LTVObj.case4;
+                        if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                            LTV[2] = LTVObj.case5;
+                    }
                     stressType = "Severe Stress";
             }
             if(othStressPercentageConsolidated === 100){
                 consolidatedCaseType = "case-9";
-                if(accType === "loan")
-                    resolutionFramework = ["M2","M2R1","M2R2"];
-                if(accType === "od")
-                    resolutionFramework = ["F2","F1F2"];
-                if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0;    
+                if(accType === "loan"){
+                    resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case3;
+                }                    
+                if(accType === "od"){
+                    resolutionFramework = ["F1","F2","F1F2"];
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                    if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case4;
+                    if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                        LTV[2] = LTVObj.case5;
+                }
                 stressType = "Severe Stress";
             }
         }else if(salStressPercentageConsolidated === 100){
             if(othStressPercentageConsolidated === 0){
                 consolidatedCaseType = "case-10";
-                if(accType === "loan")
-                    resolutionFramework = ["M2","M2R1","M2R2"];
-                if(accType === "od")
-                    resolutionFramework = ["F2","F1F2"];
-                if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0;    
+                if(accType === "loan"){
+                    resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case3;
+                }                    
+                if(accType === "od"){
+                    resolutionFramework = ["F1","F2","F1F2"];
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                    if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case4;
+                    if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                        LTV[2] = LTVObj.case5;
+                }  
                 stressType = "Severe Stress";
             }
             if(othStressPercentageConsolidated === 100){
                 consolidatedCaseType = "case-9_10";
-                if(accType === "loan")
-                    resolutionFramework = ["M2","M2R1","M2R2"];
-                if(accType === "od")
-                    resolutionFramework = ["F2","F1F2"];
-                if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[0] = LTVObj.case3;
-                // else
-                    //     LTV[1] = 0;    
+                if(accType === "loan"){
+                    resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                    if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case1;
+                    if(LTVObj.case3 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case3;
+                }                    
+                if(accType === "od"){
+                    resolutionFramework = ["F1","F2","F1F2"];
+                    if(LTVObj.case2 <= maxOfSchmSnctdLTV)
+                        LTV[0] = LTVObj.case2;
+                    if(LTVObj.case4 <= maxOfSchmSnctdLTV)
+                        LTV[1] = LTVObj.case4;
+                    if(LTVObj.case5 <= maxOfSchmSnctdLTV)
+                        LTV[2] = LTVObj.case5;
+                }
                 stressType = "Severe Stress";
             }
 
@@ -835,33 +923,15 @@ $(document).ready(function () {
 
     }
     
-    var monthlyInterest = 0;
-    function monthlyIntCalc(annualInterest){
-        annualInterest = annualInterest * .01;
-        console.log(Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1);
-        monthlyInterest =  Math.pow(parseFloat((1+parseFloat(annualInterest))), parseFloat((1/12)))-1;
-    }
+    // function monthlyIntCalc(annualInterest){
+       
+    // }
 
 
-    $( "#proposedROI" ).blur(function (){
-       // alert("test");
-        var proposedROI = Number($(this).val().trim());
-        var presentOutstanding = $('#prsntOutstdng').val().trim();
-        if( proposedROI <= 0 || 
-            presentOutstanding <= 0 ||
-            !$.isNumeric(proposedROI) ||
-            !$.isNumeric(presentOutstanding)){
-                alert("Error in Estimated interest during moratorium calculation. Please enter proper values for Present Outstanding and Proposed ROI");
-        }else{
-            // $('#estIntMoratorium').val(
-                estIntMoratorium =  parseFloat(presentOutstanding * 
-                                        (Math.pow(parseFloat((1 + parseFloat(proposedROI * .01))), parseFloat((1/12)))-1)
-                                      ).toFixed(3)
-            // );
-        }
-        monthlyIntCalc(proposedROI);
-
-    });
+    // $( "#proposedROI" ).blur(function (){
+    //    // alert("test");
+       
+    // });
 
     
     /** 
@@ -946,7 +1016,6 @@ $(document).ready(function () {
 
     
 
-    console.log("accSchmSelectedVal before calculateMaxResRepPeriod() function: "+ accSchmSelectedVal);
     //Calculator 3
     function calculateMaxResRepPeriod(){
         var $allApplicantBlncPeriod = $( "input[id^='blncPrdSnctnTrm-']" );
@@ -958,10 +1027,10 @@ $(document).ready(function () {
         });
         var minimumOfApplicantBlncPeriod = Math.min.apply(Math, arr);
 
-        if(accSchmSelectedVal === "MLOD"){
+        if(accObj.scheme === "MLOD"){
             resRepPeriod = Math.min(144, minimumOfApplicantBlncPeriod);
         }else{
-            resRepPeriod = Math.max(blncLoanTenureValue, Number(minimumOfApplicantBlncPeriod));
+            resRepPeriod = Math.max(accObj.blncLoanTenure, Number(minimumOfApplicantBlncPeriod));
             if(resRepPeriod > 180)
                 resRepPeriod = resRepPeriod;
         }
@@ -973,7 +1042,9 @@ $(document).ready(function () {
 
     //Calculator 4
     function calculateMaxExtension(){
-        var temp = resRepPeriod - blncLoanTenureValue;
+        var temp = resRepPeriod - accObj.blncLoanTenure;
+        var accSchmSelectedVal = accObj.scheme;
+        //alert("accSchmSelectedVal : "+ temp);
         if(accSchmSelectedVal === "HL" || accSchmSelectedVal === "TL" || accSchmSelectedVal === "ELWS"
         || accSchmSelectedVal === "ELWoS" || accSchmSelectedVal === "HLOD"){            
             if(temp <= 24 ){
@@ -1004,14 +1075,18 @@ $(document).ready(function () {
     //function 
     /****************Calculations Starts Here*************** */
     $('#btnCalculate').click(function(){
-        blncLoanTenureValue = Number($('#blncLoanTenure').val().trim())
+        
+        
+        //$('#divAccount').hide();
+        //$('#applicants').hide();
         //var accountType = $accType.val(); 
         stressObj = {}; //resetting global variable
-        resolutionFramework = []; //resetting global variable
+        //resolutionFramework = []; //resetting global variable
         stressType = ""; //resetting global variable
         LTV = [];
         createAccObject(); //To Create Account level object
         calculateLTV(); //To Calculate LTV for all scenario
+        calculateMaxExtension()
         //calculateFOIR();
         maxOfSchmSnctdLTV = parseFloat(Math.max(sanctLTV.val().trim(), schmLTV.val().trim())).toFixed(2);
        // maxOfBlncTenureRetirementAge = parseInt(Math.max(blncLoanTenure.val().trim(), blncPeriodRetirement.val().trim()), 10);
@@ -1060,9 +1135,11 @@ $(document).ready(function () {
 
             }else if(stressPercentageFRR == 100){
                 stressObj.case = "case-11";
-                stressObj.resolutionFramework = ["M2","M2R1","M2R2"];
+                stressObj.resolutionFramework = ["R1","R2","M1","M2","M1R1","M1R2","M2R1","M2R2"];
+                if(LTVObj.case1 <= maxOfSchmSnctdLTV)
+                    LTV[0] = LTVObj.case1;
                 if(LTVObj.case3 <= maxOfSchmSnctdLTV)
-                    LTV[1] = LTVObj.case3; 
+                    LTV[1] = LTVObj.case3;   
                 stressType = "Severe Stress";
                 upto_month24 = {upto24Months: (feb20IncFRR * .75)};
                 after_month24 = {after24Months: feb20IncFRR};
@@ -1087,7 +1164,14 @@ $(document).ready(function () {
             getEMIforM1R2();
             getEMIforM2R1();
             getEMIforM2R2();
+            $('#annexure').show();
+            $('#tblFOIR24MonthOD').hide();
+            $('#tblFOIR6MonthStepupOD').hide();
+            $('#tblFOIR6MonthOD').hide();
             $('#tblResultOD').hide();
+            $('#tblFOIR24Month').show();
+            $('#tblFOIR6MonthStepup').show();
+            $('#tblFOIR6Month').show();
             $('#tblResultLoan').show();
            
         }else if(selectedAccType  === "od"){
@@ -1096,7 +1180,14 @@ $(document).ready(function () {
             getEMIforF1();
             getEMIforF2();    
             getEMIforF1F2();
+            $('#annexure').show();
+            $('#tblFOIR24MonthOD').show();
+            $('#tblFOIR6MonthStepupOD').show();
+            $('#tblFOIR6MonthOD').show();
             $('#tblResultOD').show();
+            $('#tblFOIR24Month').hide();
+            $('#tblFOIR6MonthStepup').hide();
+            $('#tblFOIR6Month').hide();
             $('#tblResultLoan').hide();
 
         }else{
@@ -1106,11 +1197,11 @@ $(document).ready(function () {
         
     });
 
-    var presentOutstanding = 0;
-    function calculateTenureExtension(monthlyInterest, isR1){
+    //var accObj.prsntOutstdng = 0;
+    function calculateTenureExtension(isR1){
         console.log("INSIDE CALCULATE TENURE EXTENSION FUNCTION");
         var maxTenureExtn = 0;
-        presentOutstanding = Number(prsntOutstdng.val().trim());
+        //accObj.prsntOutstdng = accObj.prsntOutstdng;
         var minEmi = 0;
         var EMI24M = 0;
        // alert($accType.val());
@@ -1122,13 +1213,13 @@ $(document).ready(function () {
         }
 
         if(isR1){
-            EMI24M = pmt(monthlyInterest, blncLoanTenureValue + maxTenureExtn, -presentOutstanding,0,0).toFixed(5);
+            EMI24M = pmt(accObj.monthlyInterest, accObj.blncLoanTenure + maxTenureExtn, -accObj.prsntOutstdng,0,0).toFixed(5);
             minEmi = stressObj.repaymentOnFutureIncome.minEMI_futureInc;
         }else{
             minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
-            var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
+            var stepUpOutstndgAmt = fv(accObj.monthlyInterest,24, minEmi, -accObj.prsntOutstdng);
             console.log("stepUpOutstndgAmt : "+ stepUpOutstndgAmt);
-            EMI24M = pmt(monthlyInterest, blncLoanTenureValue + maxTenureExtn - 24, -stepUpOutstndgAmt,0,0).toFixed(5);
+            EMI24M = pmt(accObj.monthlyInterest, accObj.blncLoanTenure + maxTenureExtn - 24, -stepUpOutstndgAmt,0,0).toFixed(5);
         }
         
         // console.log("EMI for 24m+ assuming full tenure extension : "+ EMI24M);
@@ -1188,211 +1279,271 @@ $(document).ready(function () {
         }
               
     }
+
+    function updateFOIRTable(calledFrom, revisedEMI, elemIndex=""){
+        var flag1 = true, flag2= true, revisedFOIR = 0;
+        $('#foir'+elemIndex+'_rev_emi_'+calledFrom).html(revisedEMI);
+        var presentIncomeObj = stressObj.repaymentOnPresentIncome;
+        if(elemIndex === "3"){
+            var futureIncomeObj = stressObj.repaymentOnFutureIncome;
+            if(revisedEMI < futureIncomeObj.maxEMI_futureInc){
+                $('#foir'+elemIndex+'_rep_cap_'+calledFrom).html("Y");
+                flag1 = true;
+            }else{
+                $('#foir'+elemIndex+'_rep_cap_'+calledFrom).html("N");
+                flag1=false;
+            }
+            revisedFOIR = (((revisedEMI + presentIncomeObj.combinedOutsideObligation_presentInc)/futureIncomeObj.combinedRepaymentCapacity_futureInc)*100).toFixed(2);
+        }else{
+            
+            if(revisedEMI < presentIncomeObj.maxEMI_presentInc){
+                $('#foir'+elemIndex+'_rep_cap_'+calledFrom).html("Y");
+                flag1 = true;
+            }else{
+                $('#foir'+elemIndex+'_rep_cap_'+calledFrom).html("N");
+                flag1=false;
+            }
+            revisedFOIR = (((revisedEMI + presentIncomeObj.combinedOutsideObligation_presentInc)/presentIncomeObj.combinedRepaymentCapacity_presentInc)*100).toFixed(2);
+        }
+        
+       
+        
+         if(revisedEMI == 0){
+            $('#foir'+elemIndex+'_min_foir_'+calledFrom).html("Y");
+            flag2=true;
+        }else if(revisedFOIR >= 50){
+            $('#foir'+elemIndex+'_min_foir_'+calledFrom).html("Y");
+            flag2=true;
+        }else{
+            $('#foir'+elemIndex+'_min_foir_'+calledFrom).html("N");
+            flag2=false;
+        }
+
+        $('#foir'+elemIndex+'_rev_foir_'+calledFrom).html(revisedFOIR+"%");
+        $('#foir'+elemIndex+'_isPass_'+calledFrom).html(flag1 && flag2? "Y":"N");
+    }
     
     // Fucntion for calculation of Reschedule uniformly
     function getEMIforR1(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR R1 FUNCTION");
-       // var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
-        console.log("finalTenureExtnProvided :"+ finalTenureExtnProvided);
-        var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue, -presentOutstanding,0,0);
-        console.log(monthlyInterest +"\n"+ finalTenureExtnProvided +"\n"+blncLoanTenureValue +"\n"+finalTenureExtnProvided+blncLoanTenureValue +"\n"+presentOutstanding +"\n");
-           
-        console.log("post24EMI in R1 : "+post24EMI);
-        //alert("Cat 3: Post 24m EMI for R1 is: "+ post24EMI);
+        var emi_r1 = {};
 
-        //Setting result table here
-        $('#cat1_R1').html("-");
-        $('#cat2_R1').html("-");
-        $('#cat3_R1').html(Math.round(post24EMI));
-        $('#emiIntact_R1').html("Y");
-        $('#blncTenure_R1').html(finalTenureExtnProvided+blncLoanTenureValue);
+        emi_r1.finalTenureExtnProvided = calculateTenureExtension(true); //True stands for function is called from R1 resolution framework
+        //alert(emi_r1.finalTenureExtnProvided)
+        emi_r1.cat_1 = 0;
+        emi_r1.cat_2 = 0;
+        emi_r1.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, emi_r1.finalTenureExtnProvided + accObj.blncLoanTenure, -accObj.prsntOutstdng, 0, 0)));
+        emi_r1.blnc_tenure = emi_r1.finalTenureExtnProvided + accObj.blncLoanTenure;
+        emi_r1.is_emi_intact = 'Y';
+        //Setting EMI result table here
+        $('#cat1_R1').html(emi_r1.cat_1);
+        $('#cat2_R1').html(emi_r1.cat_2);
+        $('#cat3_R1').html(emi_r1.cat_3);
+        $('#emiIntact_R1').html(emi_r1.is_emi_intact);
+        $('#blncTenure_R1').html(emi_r1.blnc_tenure);
 
-        console.log("********************************************");
+        emiObj.r1 = emi_r1;
+
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("R1", emi_r1.cat_3);
+        updateFOIRTable("R1", emi_r1.cat_3, "2");
+        updateFOIRTable("R1", emi_r1.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
+
     }
 
     // Fucntion for calculation of Reschedule with step-up
     function getEMIforR2(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR R2 FUNCTION");
-        //var presentOutstanding = Number(prsntOutstdng.val().trim());
+        var emi_r2 = {};
+        emi_r2.cat_1 = 0;
+        emi_r2.stepup_period = 24;
+        emi_r2.finalTenureExtnProvided = calculateTenureExtension(true); //True stands for function is NOT called from R1 resolution framework
+        emi_r2.cat_2 = Math.round(stressObj.repaymentOnPresentIncome.minEMI_presentInc);
+        emi_r2.stepUpOutstndgAmt = Number(fv(accObj.monthlyInterest, emi_r2.stepup_period, emi_r2.cat_2, -accObj.prsntOutstdng));
+        emi_r2.cat_3 =  Math.round(Number(pmt(accObj.monthlyInterest, emi_r2.finalTenureExtnProvided + accObj.blncLoanTenure - emi_r2.stepup_period, -emi_r2.stepUpOutstndgAmt,0,0)));
+        emi_r2.is_emi_intact = Number($('#prsntEMI').val().trim()) > emi_r2.cat_2 ? "Y":"N"
+        emi_r2.blnc_tenure = emi_r2.finalTenureExtnProvided + accObj.blncLoanTenure;
+        emiObj.r2 = emi_r2;
 
-        //var stepUpPeriodR2 = Math.min(24, 24-)
-        //var postStepUpOutstndgAmt = fv(monthlyIntCalc, )
-       console.log("Calculated Moratorium : "+ calculateMoratPeriod());
-       var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
-       var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
-       var stepUpOutstndgAmt = fv(monthlyInterest,24, minEmi, -presentOutstanding);
-       var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue-24, -stepUpOutstndgAmt,0,0);
-       console.log("post24EMI in R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
-       console.log("Cat 3: Post 24m EMI for R2: "+post24EMI +"\nCat 2: Step up EMI in R2 " + minEmi);
-
-        //Setting result table here
-        $('#cat1_R2').html("-");
-        $('#cat2_R2').html(Math.round(minEmi));
-        $('#cat3_R2').html(Math.round(post24EMI));
-        $('#emiIntact_R2').html(Number($('#prsntEMI').val().trim()) > minEmi ? "Y":"N");
-        $('#blncTenure_R2').html(finalTenureExtnProvided+blncLoanTenureValue);
-       console.log("********************************************");
+	    //Setting result table here
+		$('#cat1_R2').html(emi_r2.cat_1);
+		$('#cat2_R2').html(emi_r2.cat_2);
+		$('#cat3_R2').html(emi_r2.cat_3);
+		$('#emiIntact_R2').html(emi_r2.is_emi_intact);
+        $('#blncTenure_R2').html(emi_r2.blnc_tenure);
+        
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("R2", emi_r2.cat_1);
+        updateFOIRTable("R2", emi_r2.cat_2,"2");
+        updateFOIRTable("R2", emi_r2.cat_3,"3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
     // Fucntion for calculation of Moratorium without intt. Holiday
     function getEMIforM1(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR M1 FUNCTION");
-        var moratoriumPeriod = calculateMoratPeriod();
-        //estIntMoratorium
-       // var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
-        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
-        console.log("postMoratOutstndgAmt in M1 : "+ postMoratOutstndgAmt);
-        console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
-        console.log("Cat 1: Moratorium in M1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1 " + post24EMI);
+        var emi_m1 = {};
+        emi_m1.cat_1 = Math.round(accObj.estIntMoratorium);
+        emi_m1.cat_2 = 0;
+        emi_m1.moratoriumPeriod = calculateMoratPeriod();
+        emi_m1.postMoratOutstndgAmt = fv(accObj.monthlyInterest, emi_m1.moratoriumPeriod, emi_m1.cat_1, -accObj.prsntOutstdng);
+        emi_m1.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, accObj.blncLoanTenure - emi_m1.moratoriumPeriod, -emi_m1.postMoratOutstndgAmt,0,0)));
+        emi_m1.is_emi_intact = "Y";
+        emi_m1.blnc_tenure = accObj.blncLoanTenure;
+        emiObj.m1 = emi_m1;
 
-         //Setting result table here
-         $('#cat1_M1').html(Math.round(estIntMoratorium));
-         $('#cat2_M1').html("-");
-         $('#cat3_M1').html(Math.round(post24EMI));
-         $('#emiIntact_M1').html("Y");
-         $('#blncTenure_M1').html(blncLoanTenureValue);
-        console.log("********************************************");
+        //Setting result table here
+        $('#cat1_M1').html(emi_m1.cat_1);
+        $('#cat2_M1').html(emi_m1.cat_2);
+        $('#cat3_M1').html(emi_m1.cat_3);
+        $('#emiIntact_M1').html(emi_m1.is_emi_intact);
+        $('#blncTenure_M1').html(emi_m1.blnc_tenure);
+
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("M1", emi_m1.cat_1);
+        updateFOIRTable("M1", emi_m1.cat_2, "2");
+        updateFOIRTable("M1", emi_m1.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
         
     }
 
     // Fucntion for calculation of Moratorium with intt. Holiday
     function getEMIforM2(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR M2 FUNCTION");
-        var moratoriumPeriod = calculateMoratPeriod();
-        //estIntMoratorium
-       // var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, 0, -presentOutstanding);
-        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
-        
-        console.log("postMoratOutstndgAmt in M2 : "+ postMoratOutstndgAmt);
-        console.log("Cat 3: Post 24m EMI in M2 " + post24EMI);
-        console.log("Cat 3: Post 24m EMI in M2 " + post24EMI);
+        var emi_m2 = {};
+        emi_m2.cat_1 = 0;
+        emi_m2.cat_2 = 0;
+        emi_m2.morat_int_payment = 0;
+        emi_m2.moratoriumPeriod = calculateMoratPeriod();
+        emi_m2.postMoratOutstndgAmt = fv(accObj.monthlyInterest, emi_m2.moratoriumPeriod, emi_m2.morat_int_payment, -accObj.prsntOutstdng);
+        emi_m2.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, accObj.blncLoanTenure - emi_m2.moratoriumPeriod, -emi_m2.postMoratOutstndgAmt,0,0)));
+        emi_m2.blnc_tenure = accObj.blncLoanTenure;
+        emi_m2.is_emi_intact = "Y";
+        emiObj.m2 = emi_m2;
 
         //Setting result table here
-        $('#cat1_M2').html("-");
-        $('#cat2_M2').html("-");
-        $('#cat3_M2').html(Math.round(post24EMI));
-        $('#emiIntact_M2').html("Y");
-        $('#blncTenure_M2').html(blncLoanTenureValue);
-        console.log("********************************************");        
+        $('#cat1_M2').html(emi_m2.cat_1);
+        $('#cat2_M2').html(emi_m2.cat_2);
+        $('#cat3_M2').html(emi_m2.cat_3);
+        $('#emiIntact_M2').html(emi_m2.is_emi_intact);
+        $('#blncTenure_M2').html(emi_m2.blnc_tenure)
+        
+
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("M2", emi_m2.cat_1);
+        updateFOIRTable("M2", emi_m2.cat_2, "2");
+        updateFOIRTable("M2", emi_m2.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here     
     }
 
     // Fucntion for calculation of Moratorium without intt. Holiday with uniform reschedulement
     function getEMIforM1R1(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR M1R1 FUNCTION");
-        //Interest payment (morat) = estIntMoratorium
-        var moratoriumPeriod = calculateMoratPeriod();
-        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
-        
-        var post24EMI = pmt(monthlyInterest,finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod, -presentOutstanding,0,0);
-        console.log("postMoratOutstndgAmt in M1R1 : "+ postMoratOutstndgAmt);
-        console.log("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +" \nCat 3: Post 24m EMI in M1R1 " + post24EMI);
-        console.log("Cat 1: Moratorium in M1R1: "+ estIntMoratorium +"\nCat 3: Post 24m EMI in M1R1 " + post24EMI);
+        var emi_m1r1 = {};
+        emi_m1r1.cat_1 = Math.round(accObj.estIntMoratorium);
+        emi_m1r1.cat_2 = 0;
+        emi_m1r1.moratoriumPeriod = calculateMoratPeriod();
+        emi_m1r1.finalTenureExtnProvided = calculateTenureExtension(true); //True stands for function is called from R1 resolution framework //True stands
+        emi_m1r1.postMoratOutstndgAmt = fv(accObj.monthlyInterest, emi_m1r1.moratoriumPeriod, emi_m1r1.cat_1, -accObj.prsntOutstdng);
+        emi_m1r1.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, emi_m1r1.finalTenureExtnProvided + accObj.blncLoanTenure - emi_m1r1.moratoriumPeriod, -emi_m1r1.postMoratOutstndgAmt,0,0)));
+        emi_m1r1.is_emi_intact = "Y";
+        emi_m1r1.blnc_tenure = emi_m1r1.finalTenureExtnProvided + accObj.blncLoanTenure;
+        emiObj.m1r1 = emi_m1r1;
         //Setting result table here
-        $('#cat1_M1R1').html(Math.round(estIntMoratorium));
-        $('#cat2_M1R1').html("-");
-        $('#cat3_M1R1').html(Math.round(post24EMI));
-        $('#emiIntact_M1R1').html("Y");
-        $('#blncTenure_M1R1').html(finalTenureExtnProvided + blncLoanTenureValue);
-        console.log("********************************************");
+        $('#cat1_M1R1').html(emi_m1r1.cat_1);
+        $('#cat2_M1R1').html(emi_m1r1.cat_2);
+        $('#cat3_M1R1').html(emi_m1r1.cat_3);
+        $('#emiIntact_M1R1').html(emi_m1r1.is_emi_intact);
+        $('#blncTenure_M1R1').html(emi_m1r1.blnc_tenure);
+
+         //Setting FOIR Upto 6 Month result table STARTS here 
+         updateFOIRTable("M1R1", emi_m1r1.cat_1);
+         updateFOIRTable("M1R1", emi_m1r1.cat_2,"2");
+         updateFOIRTable("M1R1", emi_m1r1.cat_3,"3");
+         //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
 
      // Fucntion for calculation of Moratorium without intt. Holiday and reschedulement with step-up
      function getEMIforM1R2(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR M1R2 FUNCTION");
-        //Interest payment (morat) = estIntMoratorium
-        var moratoriumPeriod = calculateMoratPeriod();
-        var stepUpPeriod = Math.min(24, 24 - moratoriumPeriod );
-        console.log("stepUpPeriod in M1R2 is : "+ stepUpPeriod);
-        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
-
-        var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
-        var stepUpOutstndgAmt = fv(monthlyInterest, stepUpPeriod, minEmi, -presentOutstanding);
-        console.log("stepUpOutstndgAmt in M1R2 : "+ stepUpOutstndgAmt);
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, estIntMoratorium, -presentOutstanding);
-        
-        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod - stepUpPeriod, -stepUpOutstndgAmt,0,0);
-        console.log("postMoratOutstndgAmt in M1R2 : "+ postMoratOutstndgAmt);
-        console.log("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
-        console.log("Cat 1: Moratorium in M1R2: "+ estIntMoratorium +" \nCat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M1R2 " + post24EMI);
+        var emi_m1r2 = {};
+        emi_m1r2.cat_1 = Math.round(accObj.estIntMoratorium);
+        emi_m1r2.moratoriumPeriod = calculateMoratPeriod();
+        emi_m1r2.stepUpPeriod = Math.min(24, 24 - emi_m1r2.moratoriumPeriod );
+        emi_m1r2.finalTenureExtnProvided = calculateTenureExtension(true); //True stands for function is NOT called from R1 resolution framework
+        emi_m1r2.cat_2 = Math.round(stressObj.repaymentOnPresentIncome.minEMI_presentInc);
+        emi_m1r2.stepUpOutstndgAmt = fv(accObj.monthlyInterest, emi_m1r2.stepUpPeriod, emi_m1r2.cat_2, -accObj.prsntOutstdng);
+        emi_m1r2.postMoratOutstndgAmt = fv(accObj.monthlyInterest, emi_m1r2.moratoriumPeriod, accObj.estIntMoratorium, -accObj.prsntOutstdng);
+        emi_m1r2.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, emi_m1r2.finalTenureExtnProvided + accObj.blncLoanTenure - emi_m1r2.moratoriumPeriod - emi_m1r2.stepUpPeriod, -emi_m1r2.stepUpOutstndgAmt,0,0)));
+        emi_m1r2.is_emi_intact = Number($('#prsntEMI').val().trim()) > emi_m1r2.cat_2 ? "Y":"N";
+        emi_m1r2.blnc_tenure = emi_m1r2.finalTenureExtnProvided + accObj.blncLoanTenure;
+        emiObj.m1r2 = emi_m1r2;
 
         //Setting result table here
-        $('#cat1_M1R2').html(Math.round(estIntMoratorium));
-        $('#cat2_M1R2').html(Math.round(minEmi));
-        $('#cat3_M1R2').html(Math.round(post24EMI));
-        $('#emiIntact_M1R2').html(Number($('#prsntEMI').val().trim()) > minEmi ? "Y":"N");
-        $('#blncTenure_M1R2').html(finalTenureExtnProvided+blncLoanTenureValue);
-        
-        console.log("********************************************");
+        $('#cat1_M1R2').html(emi_m1r2.cat_1);
+        $('#cat2_M1R2').html(emi_m1r2.cat_2);
+        $('#cat3_M1R2').html(emi_m1r2.cat_3);
+        $('#emiIntact_M1R2').html(emi_m1r2.is_emi_intact);
+        $('#blncTenure_M1R2').html(emi_m1r2.blnc_tenure);
+
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("M1R2", emi_m1r2.cat_1);
+        updateFOIRTable("M1R2", emi_m1r2.cat_2,"2");
+        updateFOIRTable("M1R2", emi_m1r2.cat_3,"3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
 
     // Fucntion for calculation of Moratorium with intt. Holiday with uniform reschedulement
     function getEMIforM2R1(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR M2R1 FUNCTION");
-        var moratoriumPeriod = calculateMoratPeriod();
-        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, true);
-        //estIntMoratorium
-       // var presentOutstanding = Number(prsntOutstdng.val().trim());
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, 0, -presentOutstanding);
-        var post24EMI = pmt(monthlyInterest, blncLoanTenureValue + finalTenureExtnProvided- moratoriumPeriod, -postMoratOutstndgAmt,0,0);
-        
-        console.log("postMoratOutstndgAmt in M2R1 : "+ postMoratOutstndgAmt);
-        console.log("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
-        console.log("Cat 3: Post 24m EMI in M2R1 " + post24EMI);
-        
+        var emi_m2r1 = {};
+        emi_m2r1.cat_1 = 0
+        emi_m2r1.cat_2 = 0
+        emi_m2r1.moratoriumPeriod = calculateMoratPeriod();
+        emi_m2r1.finalTenureExtnProvided = calculateTenureExtension(true); //True stands for function is called from R1 resolution framework
+        emi_m2r1.postMoratOutstndgAmt = fv(accObj.monthlyInterest, emi_m2r1.moratoriumPeriod, 0, -accObj.prsntOutstdng);
+        emi_m2r1.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, accObj.blncLoanTenure + emi_m2r1.finalTenureExtnProvided - emi_m2r1.moratoriumPeriod, -emi_m2r1.postMoratOutstndgAmt,0,0)));
+        emi_m2r1.is_emi_intact = "Y";
+        emi_m2r1.blnc_tenure = emi_m2r1.finalTenureExtnProvided + accObj.blncLoanTenure;
+        emiObj.m2r1 = emi_m2r1;
+
         //Setting result table here
-        $('#cat1_M2R1').html("-");
-        $('#cat2_M2R1').html("-");
-        $('#cat3_M2R1').html(Math.round(post24EMI));
-        $('#emiIntact_M2R1').html("Y");
-        $('#blncTenure_M2R1').html(finalTenureExtnProvided+blncLoanTenureValue);
-        console.log("********************************************");
-        
+        $('#cat1_M2R1').html(emi_m2r1.cat_1);
+        $('#cat2_M2R1').html(emi_m2r1.cat_2);
+        $('#cat3_M2R1').html(emi_m2r1.cat_3);
+        $('#emiIntact_M2R1').html(emi_m2r1.is_emi_intact);
+        $('#blncTenure_M2R1').html(emi_m2r1.blnc_tenure);
+
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("M2R1", emi_m2r1.cat_1);
+        updateFOIRTable("M2R1", emi_m2r1.cat_2, "2");
+        updateFOIRTable("M2R1", emi_m2r1.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
     // Fucntion for calculation of Moratorium with intt. Holiday and reschedulement with step-up
     function getEMIforM2R2(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR M2R2 FUNCTION");
-        //Interest payment (morat) = estIntMoratorium
-        var moratoriumPeriod = calculateMoratPeriod();
-        var stepUpPeriod = Math.min(24, 24 - moratoriumPeriod );
-        console.log("stepUpPeriod in M2R2 is : "+ stepUpPeriod);
-        var finalTenureExtnProvided = calculateTenureExtension(monthlyInterest, false);
-
-        var postMoratOutstndgAmt = fv(monthlyInterest, moratoriumPeriod, 0, -presentOutstanding);
-        console.log("postMoratOutstndgAmt in M2R2 : "+ postMoratOutstndgAmt);
-
-        var minEmi = stressObj.repaymentOnPresentIncome.minEMI_presentInc;
-        var stepUpOutstndgAmt = fv(monthlyInterest,stepUpPeriod, minEmi, -postMoratOutstndgAmt);
-        console.log("stepUpOutstndgAmt in M1R2 : "+ stepUpOutstndgAmt);
-        
-        
-        var post24EMI = pmt(monthlyInterest, finalTenureExtnProvided + blncLoanTenureValue - moratoriumPeriod - stepUpPeriod, -stepUpOutstndgAmt,0,0);
-        
-        console.log("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
-        console.log("Cat 2: Step up EMI :" + minEmi + "\nCat 3: Post 24m EMI in M2R2 " + post24EMI);
-
-
+        var emi_m2r2 = {};
+        emi_m2r2.cat_1 = 0;
+        emi_m2r2.cat_2 = Math.round(stressObj.repaymentOnPresentIncome.minEMI_presentInc);
+        emi_m2r2.moratoriumPeriod = calculateMoratPeriod();
+        emi_m2r2.stepUpPeriod = Math.min(24, 24 - emi_m2r2.moratoriumPeriod );
+        emi_m2r2.finalTenureExtnProvided = calculateTenureExtension(true); //True stands for function is NOT called from R1 resolution framework
+        emi_m2r2.postMoratOutstndgAmt = fv(accObj.monthlyInterest, emi_m2r2.moratoriumPeriod, 0, -accObj.prsntOutstdng);
+        emi_m2r2.stepUpOutstndgAmt = fv(accObj.monthlyInterest, emi_m2r2.stepUpPeriod,  emi_m2r2.cat_2, -emi_m2r2.postMoratOutstndgAmt);
+        emi_m2r2.cat_3 =  Math.round(Number(pmt(accObj.monthlyInterest, emi_m2r2.finalTenureExtnProvided + accObj.blncLoanTenure - emi_m2r2.moratoriumPeriod - emi_m2r2.stepUpPeriod, -emi_m2r2.stepUpOutstndgAmt,0,0)));
+        emi_m2r2.is_emi_intact = Number($('#prsntEMI').val().trim()) >  emi_m2r2.cat_2 ? "Y":"N";
+        emi_m2r2.blnc_tenure = emi_m2r2.finalTenureExtnProvided + accObj.blncLoanTenure;
+        emiObj.m2r2 = emi_m2r2;
         //Setting result table here
-        $('#cat1_M2R2').html("-");
-        $('#cat2_M2R2').html(Math.round(minEmi));
-        $('#cat3_M2R2').html(Math.round(post24EMI));
-        $('#emiIntact_M2R2').html(Number($('#prsntEMI').val().trim()) > minEmi ? "Y":"N");
-        $('#blncTenure_M2R2').html(finalTenureExtnProvided+blncLoanTenureValue);
+        $('#cat1_M2R2').html(emi_m2r2.cat_1);
+        $('#cat2_M2R2').html( emi_m2r2.cat_2);
+        $('#cat3_M2R2').html(emi_m2r2.cat_3);
+        $('#emiIntact_M2R2').html(emi_m2r2.is_emi_intact);
+        $('#blncTenure_M2R2').html(emi_m2r2.blnc_tenure);
         
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("M2R2", emi_m2r2.cat_1);
+        updateFOIRTable("M2R2", emi_m2r2.cat_2, "2");
+        updateFOIRTable("M2R2", emi_m2r2.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
+
         console.log("********************************************");
     }
 
@@ -1400,88 +1551,79 @@ $(document).ready(function () {
     var unsrvcdIntVal = 0;
     var sanctndAmtVal = 0;
     var fitlTenureEntered =  0;
-    //var ODLimit = $('#fitlMorat').val("30000");
-     // Fucntion for calculation of Conversion of interest accrued
-     function getEMIforF1(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR F1 FUNCTION");
-        unsrvcdIntVal = Number(unsrvcdInt.val().trim());
-        sanctndAmtVal = Number(sanctndAmt.val().trim());
-        fitlTenureEntered = Number($('#fitlRepTenure').val().trim());
-        var fitlTenure = Math.max(fitlTenureEntered, 12);
-        var moratoriumPeriod = 0;
+    function getEMIforF1(){
+        var emi_f1 = {};
+        emi_f1.fitlTenure = Math.max(accObj.fitlRepTenure, 12);
+        emi_f1.moratoriumPeriod = 0;
+        emi_f1.cat_1 = 0;
+        emi_f1.cat_2 =  Math.round(Number(pmt(accObj.monthlyInterest, emi_f1.fitlTenure - emi_f1.moratoriumPeriod, -accObj.unsrvcdInt,0,0)));
+        emi_f1.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, resRepPeriod, -accObj.sanctndAmt,  0, 0)));
+        emi_f1.is_emi_intact = "Y"
+        emi_f1.blnc_tenure = 0;
+        emiObj.f1 = emi_f1;
 
-        //var postMoratOutstndgAmt = 
-
-        var post24EMI = pmt(monthlyInterest, fitlTenure- moratoriumPeriod, -unsrvcdIntVal,0,0);
-        console.log("Max Res Rep period inside F1 is : "+ resRepPeriod);
-        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0);
-
-        console.log("postMoratOutstndgAmt in F1 : "+unsrvcdIntVal);
-        console.log("Outstanding Amt (Post Morat) in F1 is: "+ post24EMI);
-        console.log("Cat 4: EMI for OD in F1 is: "+ ODEmi);
-
-         //Setting result table here
-         $('#cat1_F1').html("-");
-         $('#cat2_F1').html(Math.round(post24EMI));
-         $('#cat3_F1').html(Math.round(ODEmi));
-         $('#emiIntact_F1').html("Y");
-         $('#blncTenure_F1').html("0");
-        console.log("********************************************");
+        //Setting result table here
+        $('#cat1_F1').html(emi_f1.cat_1);
+        $('#cat2_F1').html(emi_f1.cat_2);
+        $('#cat3_F1').html(emi_f1.cat_3);
+        $('#emiIntact_F1').html(emi_f1.is_emi_intact);
+        $('#blncTenure_F1').html(emi_f1.blnc_tenure);
+         //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("F1", emi_f1.cat_1);
+        updateFOIRTable("F1", emi_f1.cat_2, "2");
+        updateFOIRTable("F1", emi_f1.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
     // Fucntion for calculation of Conversion of interest to be accrued
      function getEMIforF2(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR F2 FUNCTION");
-        //unsrvcdIntVal = Number(unsrvcdInt.val().trim());
-        sanctndAmtVal = Number(sanctndAmt.val().trim());
-        fitlTenureEntered = Number($('#fitlRepTenure').val().trim());
-        var fitlTenure = Math.min(fitlTenureEntered, 6);
-        var moratoriumPeriod = 0;
-
-        var accruedIntOnOD = fv(monthlyInterest, fitlTenure, 0, -sanctndAmtVal) - sanctndAmtVal;
-
-        var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -accruedIntOnOD, 0, 0);
-        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0);
-        console.log("accruedIntOnOD in F2 : "+ accruedIntOnOD);
-        console.log("Cat 2: Post 24m EMI for F2: "+ post24EMI);
-
-         //Setting result table here
-         $('#cat1_F2').html("-");
-         $('#cat2_F2').html(Math.round(post24EMI));
-         $('#cat3_F2').html(Math.round(ODEmi));
-         $('#emiIntact_F2').html("Y");
-         $('#blncTenure_F2').html("0");
-        console.log("********************************************");
+        var emi_f2 = {};
+        emi_f2.fitlTenure = Math.min(accObj.fitlRepTenure, 6);
+        emi_f2.cat_1 = 0;
+        emi_f2.moratoriumPeriod = 0;
+        emi_f2.accruedIntOnOD = fv(accObj.monthlyInterest, emi_f2.fitlTenure, 0, -accObj.sanctndAmt) - accObj.sanctndAmt;
+        emi_f2.cat_2 = Math.round(Number(pmt(accObj.monthlyInterest, accObj.fitlRepTenure, -emi_f2.accruedIntOnOD, 0, 0)));
+        emi_f2.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, resRepPeriod, -accObj.sanctndAmt,  0, 0)));
+        emi_f2.is_emi_intact = "Y";
+        emi_f2.blnc_tenure = 0;
+        emiObj.f2 = emi_f2;
+        //Setting result table here
+        $('#cat1_F2').html(emi_f2.cat_1);
+        $('#cat2_F2').html(emi_f2.cat_2);
+        $('#cat3_F2').html(emi_f2.cat_3);
+        $('#emiIntact_F2').html(emi_f2.is_emi_intact);
+        $('#blncTenure_F2').html(emi_f2.blnc_tenure);
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("F2", emi_f2.cat_1);
+        updateFOIRTable("F2", emi_f2.cat_2, "2");
+        updateFOIRTable("F2", emi_f2.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
      // Conversion of interest accrued and to be accrued
      function getEMIforF1F2(){
-        console.log("********************************************");
-        console.log("INSIDE GET EMI FOR F1F2 FUNCTION");
-        unsrvcdIntVal = Number(unsrvcdInt.val().trim());
-        sanctndAmtVal = Number(sanctndAmt.val().trim());
-        fitlTenureEntered = Number($('#fitlRepTenure').val().trim());
-        var fitlTenure = Math.min(fitlTenureEntered, 6);
-        var moratoriumPeriod = 0;
-
-        var accruedIntOnOD = Number(fv(monthlyInterest, fitlTenure, 0, -sanctndAmtVal) - sanctndAmtVal);
-
-        var postMoratOutstndgAmt = Number(fv(monthlyInterest, fitlTenure, 0, -unsrvcdIntVal));
-        console.log("accruedIntOnOD + postMoratOutstndgAmt : "+ accruedIntOnOD + postMoratOutstndgAmt);
-        var post24EMI = pmt(monthlyInterest, fitlTenureEntered, -(accruedIntOnOD + postMoratOutstndgAmt), 0, 0);
-        var ODEmi = pmt(monthlyInterest, resRepPeriod, -sanctndAmtVal,  0, 0);
-        console.log("accruedIntOnOD in F1F2 : "+ accruedIntOnOD);
-        console.log("postMoratOutstndgAmt in F1F2 : "+ postMoratOutstndgAmt);
-        console.log("Cat 3: Post 24m EMI for F1F2: "+ post24EMI);
-         //Setting result table here
-         $('#cat1_F1F2').html("-");
-         $('#cat2_F1F2').html(Math.round(post24EMI));
-         $('#cat3_F1F2').html(Math.round(ODEmi));
-         $('#emiIntact_F1F2').html("Y");
-         $('#blncTenure_F1F2').html("0");
-        console.log("********************************************");
+        var emi_f1f2 = {};
+        emi_f1f2.cat_1 = 0;
+        emi_f1f2.fitlTenure = Math.min(accObj.fitlRepTenure, 6);
+        emi_f1f2.moratoriumPeriod = 0;
+        emi_f1f2.accruedIntOnOD = Number(fv(accObj.monthlyInterest, emi_f1f2.fitlTenure, 0, -accObj.sanctndAmt) - accObj.sanctndAmt);
+        emi_f1f2.postMoratOutstndgAmt = Number(fv(accObj.monthlyInterest, emi_f1f2.fitlTenure, 0, -accObj.unsrvcdInt));
+        emi_f1f2.cat_2 = Math.round(Number(pmt(accObj.monthlyInterest, accObj.fitlRepTenure, -(emi_f1f2.accruedIntOnOD + emi_f1f2.postMoratOutstndgAmt), 0, 0)));
+        emi_f1f2.cat_3 = Math.round(Number(pmt(accObj.monthlyInterest, resRepPeriod, -accObj.sanctndAmt,  0, 0)));
+        emi_f1f2.is_emi_intact = "Y";
+        emi_f1f2.blnc_tenure = 0;
+        emiObj.f1f2 = emi_f1f2;
+        //Setting result table here
+        $('#cat1_F1F2').html(emi_f1f2.cat_1);
+        $('#cat2_F1F2').html(emi_f1f2.cat_2);
+        $('#cat3_F1F2').html(emi_f1f2.cat_3);
+        $('#emiIntact_F1F2').html(emi_f1f2.is_emi_intact);
+        $('#blncTenure_F1F2').html(emi_f1f2.blnc_tenure);
+        //Setting FOIR Upto 6 Month result table STARTS here 
+        updateFOIRTable("F1F2", emi_f1f2.cat_1);
+        updateFOIRTable("F1F2", emi_f1f2.cat_2, "2");
+        updateFOIRTable("F1F2", emi_f1f2.cat_3, "3");
+        //Setting FOIR Upto 6 Month result table ENDS here 
     }
 
 
